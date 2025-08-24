@@ -81,3 +81,48 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#111318;b
 .downloads a{display:inline-block;margin:6px 8px 6px 0}
 blockquote{margin:10px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--muted)}
 small{color:var(--muted)}
+/* ページ全体の文字スタイル */
+body {
+  font-family: "游明朝", "Yu Mincho", "Hiragino Mincho ProN", "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #222;
+  background-color: #fdfdfd;
+}
+
+/* 見出し（大） */
+h1 {
+  font-size: 2.5em;
+  color: #111;
+  text-align: center;
+  border-bottom: 2px solid #444;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* 見出し（中） */
+h2 {
+  font-size: 1.8em;
+  color: #333;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+/* 見出し（小） */
+h3 {
+  font-size: 1.4em;
+  color: #444;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+/* 段落 */
+p {
+  margin-bottom: 15px;
+}
+
+/* リスト */
+ul, ol {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
