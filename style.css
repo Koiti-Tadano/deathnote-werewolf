@@ -101,3 +101,6 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#111318;b
 .downloads a{display:inline-block;margin:6px 8px 6px 0}
 blockquote{margin:10px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--muted)}
 small{color:var(--muted)}
+body {
+  background: #111 !important;
+}
