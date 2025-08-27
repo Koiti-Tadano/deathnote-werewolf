@@ -114,6 +114,7 @@ small{color:var(--muted)}
   max-width: 80%;
   max-height: 80%;
   transform-style: preserve-3d;
+  transform-origin: left center; 
   animation: pageFlip 2s ease forwards;
   animation-delay: 3s; /* 表紙表示時間 */
 }
