@@ -1,0 +1,103 @@
+/* Notebook-inspired dark theme */
+:root{
+  --bg:#0f0f10;
+  --paper:#141519;
+  --ink:#e6e6e6;
+  --muted:#a8acb3;
+  --accent:#bb2b2b;
+  --accent-2:#3a7bd5;
+  --card:#1a1c22;
+  --line:#2a2d35;
+  --shadow:rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+
+body{
+  margin:0;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  background: radial-gradient(1200px 600px at 10% -10%, #16181e, var(--bg)),
+              linear-gradient(180deg, #0c0d10, var(--bg));
+  color:var(--ink);
+}
+
+/* リンク */
+a{color:var(--accent-2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* レイアウト系 */
+.container{max-width:1000px;margin:0 auto;padding:24px}
+.nav{
+  position:sticky;top:0;z-index:9;
+  backdrop-filter:saturate(140%) blur(8px);
+  background:rgba(10,10,12,.6);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{display:flex;gap:16px;align-items:center;justify-content:space-between;max-width:1000px;margin:0 auto;padding:12px 24px}
+.brand{display:flex;gap:12px;align-items:center}
+.brand .logo{
+  width:28px;height:28px;border:1px solid var(--line);border-radius:4px;
+  display:grid;place-items:center;background:var(--card);box-shadow:0 2px 6px var(--shadow);
+  font-weight:700;color:var(--ink);letter-spacing:.5px
+}
+.brand .title{font-weight:700}
+.menu{display:flex;gap:14px}
+.button{
+  display:inline-flex;align-items:center;gap:.5em;
+  background:linear-gradient(180deg, #20222a, #171a20);
+  color:var(--ink);border:1px solid var(--line);border-radius:8px;
+  padding:10px 14px;box-shadow:0 2px 8px var(--shadow);
+}
+.button:hover{filter:brightness(1.1);text-decoration:none}
+
+/* ヒーロー */
+.hero{
+  padding:64px 0 24px;border-bottom:1px dashed var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+}
+.hero h1{font-size: clamp(28px, 4vw, 40px);margin:0 0 8px}
+.hero p{color:var(--muted);margin:0}
+
+/* グリッドカード */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}
+.card{
+  background:linear-gradient(180deg, #17191f, #13161b);
+  border:1px solid var(--line);border-radius:12px;padding:18px;
+  box-shadow:0 3px 12px var(--shadow);
+}
+.card h3{margin-top:0}
+
+/* 見出し・テキスト */
+.kicker{font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.section{margin:32px 0}
+h1,h2,h3{color:var(--ink);margin:8px 0}
+h1{font-size:2em}
+h2{font-size:1.6em}
+h3{font-size:1.2em}
+p{margin-bottom:15px;color:var(--ink)}
+.sub{color:var(--muted);margin-top:0}
+
+/* 装飾要素 */
+.note{
+  border-left:3px solid var(--accent);padding:12px 14px;background:rgba(187,43,43,.08);
+  border-radius:6px;margin:16px 0
+}
+details{
+  background:linear-gradient(180deg, #151820, #12141a);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0;
+}
+details > summary{
+  cursor:pointer;font-weight:600;color:var(--ink);
+  list-style:none;
+}
+details > summary::-webkit-details-marker{display:none}
+
+hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+.footer{color:var(--muted);font-size:13px;padding:40px 0}
+kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#111318;border:1px solid var(--line);border-radius:4px;padding:0 6px}
+.downloads a{display:inline-block;margin:6px 8px 6px 0}
+blockquote{margin:10px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--muted)}
+small{color:var(--muted)}
