@@ -43,11 +43,27 @@
   </div>
 </section>
 
-<section class="section" id="comments">
+<section class="section comments">
   <h2>コメント</h2>
-  <div id="comments-slot"></div>
-  <noscript>コメントを表示するにはJavaScriptを有効にしてください。</noscript>
+  <div id="disqus_thread"></div>
+  <noscript>
+    コメントを表示するにはJavaScriptを有効にしてください。
+  </noscript>
 </section>
+
+<script>
+var disqus_config = function () {
+  this.page.url = window.location.href;
+  this.page.identifier = window.location.pathname;
+};
+
+(function() {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://YOUR_SHORTNAME.disqus.com/embed.js';  // ショートネームを置き換える
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
 
 <hr>
 <div class="footer">
