@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ルール | デスノート人狼（非公式）</title>
+<link rel="stylesheet" href="assets/style.css">
+<script defer src="assets/config.js"></script>
+<script defer src="assets/script.js"></script>
+</head><body>
+
+<div class="nav"><div class="nav-inner">
+  <div class="brand"><div class="logo">DN</div><div class="title">デスノート人狼（非公式）</div></div>
+  <div class="menu">
+    <a class="button" href="index.html">トップ</a>
+    <a class="button" href="rules.html">ルール</a>
+    <a class="button" href="materials.html">配布物</a>
+    <a class="button" href="samples.html">サンプルプレイ</a>
+  </div>
+</div></div>
+
+<div class="container">
+
+<section class="hero">
+  <span class="kicker">Rules</span>
+  <h1>ルール</h1>
+  <p class="sub">章ごとに開閉できます。プレイ中の参照にも。</p>
+</section>
+<section class="section">
+<h2>初心者版 ルールブック</h2>
+
+<details open data-group="rules"><summary>1. ゲーム概要</summary>
+<p>プレイヤーは仮想の村に住む住民となり、「人狼（デスノート所持者）」と「市民」に分かれて正体を隠しながら生き残りを目指す。人狼は他人の仮想フルネームを知ることで、その夜に相手を殺せる。市民は協力して人狼を見つけ出し、10日以内に排除すれば勝利となる。</p>
+</details>
+
+<details data-group="rules"><summary>2. プレイヤー人数</summary>
+<ul>
+<li>推奨：6〜8人（今回は7人例）</li>
+<li>人狼：1人 / 市民：複数 / 狂人：1人</li>
+</ul>
+</details>
+
+<details data-group="rules"><summary>3. 勝利条件</summary>
+<p><strong>市民陣営</strong></p>
+<ol>
+<li>人狼を吊る</li>
+<li>10日経過時点で人狼が能力を失っている</li>
+<li>人狼が「死神の目」を使用後、5日経過時に人狼が勝利条件を満たしていない</li>
+</ol>
+<p><strong>人狼陣営</strong></p>
+<ol>
+<li>市民の人数を人狼側が上回る・同数にする</li>
+<li>能力を保持している状態で勝利条件を満たしている</li>
+</ol>
+<p><strong>狂人</strong>：人狼が勝利条件を満たす（狂人死亡後でも可）</p>
+</details>
+
+<details data-group="rules"><summary>4. 役職と能力</summary>
+<h4>市民</h4>
+<ul>
+<li>特殊能力なし</li>
+<li>他市民と協力して人狼を排除する</li>
+<li>協力には自分のフルネームを明かす必要がある（特殊ルール①）</li>
+</ul>
+<h4>探偵</h4>
+<ul>
+<li>期間を「1〜3日目」「4〜6日目」「7日目以降」に区切り、それぞれ1回ずつ能力を使用可能</li>
+<li>夜に、その日を含む期間中の、誰か1人の発言を1つ指定し、真偽をGMに確認できる（客観的事実のみ）</li>
+<li>判定は「事実だった」or「事実ではなかった」のみ（推測や意見は対象外）</li>
+</ul>
+<h4>人狼</h4>
+<ul>
+<li>名前を知った相手を夜にキル可能</li>
+<li>一度だけ「死神の目」可能（発動から5日以内に勝てなければ敗北）（特殊ルール②）</li>
+</ul>
+<h4>狂人</h4>
+<ul>
+<li>寿命制限付き（ゲーム開始から5日で脱落）で人狼陣営を勝たせる第三陣営</li>
+<li>ゲーム開始時点で全員のフルネームを知っている</li>
+<li>人狼に教えられる名前は2人まで</li>
+<li>人狼陣営にはカウントされない（人狼勝利条件は変わらない）</li>
+<li>狂人は吊りで殺された場合のみ全体に役職が明かされる</li>
+<li>人狼とは互いに正体がわからない</li>
+</ul>
+</details>
+
+<details data-group="rules"><summary>5. 特殊ルール</summary>
+<h4>① 情報カード解除</h4>
+<ul>
+<li>全プレイヤーは自身の「名刺」と、人狼につながる暗号の「情報カード」を持つ</li>
+<li>狂人の情報カードのみ偽物（見分け不可）</li>
+<li><strong>交渉2パターン：</strong>
+  <ol>
+    <li>口頭でフルネームを伝える → 相手の情報カードの内容を口頭で聞ける</li>
+    <li>名刺を見せる → 相手の情報カードそのものを見せてもらえる</li>
+  </ol>
+</li>
+</ul>
+<h4>② 死神の目</h4>
+<ul><li>人狼がゲーム中に一度だけ発動可能。任意の1人のフルネームを知る</li></ul>
+<h4>③ 捜査グループ</h4>
+<ul>
+<li>名刺を交換したプレイヤー同士3人以上で作成可（最大4人）</li>
+<li>グループ内で自由会話・情報カード開示ができる</li>
+<li>昼フェーズのいつでも作成可</li>
+</ul>
+</details>
+
+<details data-group="rules"><summary>6. フェーズ進行</summary>
+<ol>
+<li><strong>朝</strong>：前夜の犠牲者発表</li>
+<li><strong>進行昼</strong>（個別会話）：1対1で会話。名前開示は任意</li>
+<li><strong>夕方</strong>（全体会議）：情報共有／吊り投票（任意）</li>
+<li><strong>夜</strong>：①人狼の能力使用 → ②探偵の能力使用</li>
+</ol>
+</details>
+
+<details data-group="rules"><summary>7. 推奨構成（7人例）</summary>
+<ul>
+<li>人狼：1人 / 市民：4人 / 探偵：1人（市民陣営） / 狂人：1人</li>
+</ul>
+</details>
+</section>
+
+<section class="section" id="comments">
+  <h2>コメント</h2>
+  <div id="comments-slot"></div>
+</section>
+
+<hr>
+<div class="footer">
+  <div>非公式二次創作ファンルール集です。原作・公式とは関係ありません。</div>
+  <div>© Fans of Ded Note Werewolf (Unofficial)</div>
+</div>
+</div></body></html>
+
