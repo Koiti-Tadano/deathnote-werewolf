@@ -116,7 +116,7 @@ small{color:var(--muted)}
   transform-style: preserve-3d;
   transform-origin: left center; 
   animation: pageFlip 2s ease forwards;
-  animation-delay: 3s; /* 表紙表示時間 */
+  animation-delay: 1s; /* 表紙表示時間 */
 }
 #main-content {
   display: none;
