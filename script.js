@@ -36,3 +36,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+window.addEventListener('DOMContentLoaded', () => {
+  const intro = document.getElementById('intro');
+  const main = document.getElementById('main-content');
+
+  if (!sessionStorage.getItem('introShown')) {
+    // 初回のみ表示
+    setTimeout(() => {
+      intro.style.display = 'none';
+      main.style.display = 'block';
+    }, 5000); // 表紙表示3秒 + 回転2秒
+
+    sessionStorage.setItem('introShown', 'true');
+  } else {
+    // 既に見た場合は即表示
+    intro.style.display = 'none';
+    main.style.display = 'block';
+  }
+});
