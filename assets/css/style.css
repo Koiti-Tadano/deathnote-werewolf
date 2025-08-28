@@ -102,7 +102,4 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#111318;b
 blockquote{margin:10px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--muted)}
 small{color:var(--muted)}
 
-@media (max-width: 480px) {
-  .logo { display: none; }
-}
 
