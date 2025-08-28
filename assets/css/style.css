@@ -106,7 +106,7 @@ small{color:var(--muted)}
   .button {
     font-size: 14px;   /* 文字を小さく */
     padding: 6px;      /* 余白を減らす */
-    min-width: 30px;   /* ボタンの最小幅 */
+    min-width: 48px;   /* ボタンの最小幅 */
     min-height: 100px; /* ボタンを少し低めに */
   }
 
