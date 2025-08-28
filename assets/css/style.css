@@ -104,6 +104,9 @@ small{color:var(--muted)}
 
 @media (max-width: 600px) {
   .button {
+    display: flex;
+    justify-content: center; /* 横方向の中央 */
+    align-items: center;       
     writing-mode: vertical-rl; /* ← 縦書きにする */
     text-orientation: upright; /* ← 文字を正しい向きで */
     font-size: 14px;           /* 文字を少し小さく（全体9/10相当） */
