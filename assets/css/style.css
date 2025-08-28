@@ -106,7 +106,7 @@ small{color:var(--muted)}
 .nav {
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem;
+  gap: .2rem;
 }
 
 
