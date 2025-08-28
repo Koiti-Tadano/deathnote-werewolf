@@ -113,7 +113,7 @@ small{color:var(--muted)}
 .nav a,
 .nav button {
   white-space: nowrap;
-  padding: .5rem .8rem;
+  padding: .5rem .3rem;
   font-size: clamp(13px, 2.6vw, 15px);
   line-height: 1;
 }
