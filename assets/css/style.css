@@ -103,6 +103,6 @@ blockquote{margin:10px 0;padding-left:12px;border-left:3px solid var(--line);col
 small{color:var(--muted)}
 
 /* メニュー展開中だけブランドの文字(DN)を隠す */
-header.site-header:has(#menu-toggle:checked) .brand {
+header.site-header:has(#menu-toggle:checked) .logo {
   display: none;
 }
