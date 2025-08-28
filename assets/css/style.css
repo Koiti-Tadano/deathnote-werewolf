@@ -102,18 +102,17 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#111318;b
 blockquote{margin:10px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--muted)}
 small{color:var(--muted)}
 
-/* ナビ全体を折り返し可能に＆隙間調整 */
-.nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .2rem;
+@media (max-width: 600px) {
+  .button {
+    font-size: 14px;   /* 文字を小さく */
+    padding: 6px;      /* 余白を減らす */
+    min-width: 48px;   /* ボタンの最小幅 */
+    min-height: 100px; /* ボタンを少し低めに */
+  }
+
+  .menu {
+    gap: 8px;          /* ボタン同士の間隔も少し狭く */
+  }
 }
-/* 最終手段：横スクロールを許可（必要なら有効化） */
-/*
-.nav {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-*/
 
 
