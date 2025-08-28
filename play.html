@@ -1,0 +1,21 @@
+<body>
+  <h1>部屋に入る</h1>
+  <label>プレイヤー名: <input id="playerName"></label><br>
+  <label>ルームID: <input id="roomId"></label><br>
+  <button onclick="enterRoom()">入室</button>
+
+  <script>
+    function enterRoom() {
+      const name = document.getElementById("playerName").value;
+      const room = document.getElementById("roomId").value;
+      if (!name || !room) {
+        alert("名前とルームIDを入力してください");
+        return;
+      }
+      // プレイヤー名を保存
+      localStorage.setItem("playerName", name);
+      // chat.htmlに移動
+      window.location.href = "chat.html?room=" + encodeURIComponent(room);
+    }
+  </script>
+</body>
