@@ -106,3 +106,16 @@ small{color:var(--muted)}
 header.site-header:has(#menu-toggle:checked) .logo {
   display: none;
 }
+
+.wrapper {
+  display: flex;
+  justify-content: center; /* 横中央 */
+  align-items: center;     /* 縦中央 */
+  height: 100vh;           /* 画面全体の高さを使う */
+}
+
+.center-box {
+  background: #444;
+  padding: 20px;
+  color: #fff;
+}
