@@ -102,20 +102,7 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#111318;b
 blockquote{margin:10px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--muted)}
 small{color:var(--muted)}
 
-/* メニュー展開中だけブランドの文字(DN)を隠す */
-header.site-header:has(#nav-accordion:checked) .logo {
-  display: none;
+@media (max-width: 480px) {
+  .logo { display: none; }
 }
 
-.wrapper {
-  display: flex;
-  justify-content: center; /* 横中央 */
-  align-items: center;     /* 縦中央 */
-  height: 100vh;           /* 画面全体の高さを使う */
-}
-
-.center-box {
-  background: #444;
-  padding: 20px;
-  color: #fff;
-}
