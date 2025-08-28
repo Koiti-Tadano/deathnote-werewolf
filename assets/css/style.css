@@ -104,8 +104,8 @@ small{color:var(--muted)}
 
 @media (max-width: 600px) {
   .button {
-    font-size: 14px;   /* 文字を小さく */
-    padding: 6px;      /* 余白を減らす */
+    font-size: 10px;   /* 文字を小さく */
+    padding: 3px;      /* 余白を減らす */
     min-width: 48px;   /* ボタンの最小幅 */
     min-height: 100px; /* ボタンを少し低めに */
   }
