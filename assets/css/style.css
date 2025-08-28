@@ -104,14 +104,16 @@ small{color:var(--muted)}
 
 @media (max-width: 600px) {
   .button {
-    font-size: 10px;   /* 文字を小さく */
-    padding: 3px;      /* 余白を減らす */
-    min-width: 48px;   /* ボタンの最小幅 */
-    min-height: 100px; /* ボタンを少し低めに */
+    writing-mode: vertical-rl; /* ← 縦書きにする */
+    text-orientation: upright; /* ← 文字を正しい向きで */
+    font-size: 14px;           /* 文字を少し小さく（全体9/10相当） */
+    padding: 10px 4px;         /* 横幅は細め、縦余白は確保 */
+    min-height: 140px;         /* 縦長に調整 */
+    min-width: 40px;           /* 横幅を狭く */
   }
 
   .menu {
-    gap: 8px;          /* ボタン同士の間隔も少し狭く */
+    gap: 6px; /* ボタン同士の隙間を少し詰める */
   }
 }
 
