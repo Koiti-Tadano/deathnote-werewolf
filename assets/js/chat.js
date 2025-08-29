@@ -1,23 +1,27 @@
 // assets/js/chat.js
 const db = firebase.database();
-const roomId = new URLSearchParams(window.location.search).get("room");
-const messagesRef = db.ref("rooms/" + roomId + "/messages");
+const messagesRef = db.ref("messages");
 
-document.getElementById("sendBtn").addEventListener("click", () => {
-  const text = document.getElementById("msgInput").value;
-  if (text.trim()) {
+const msgInput = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const messagesList = document.getElementById("messages");
+
+// メッセージ送信
+sendBtn.addEventListener("click", () => {
+  const text = msgInput.value;
+  if (text.trim() !== "") {
     messagesRef.push({
-      user: localStorage.getItem("playerName") || "名無し",
       text: text,
       time: Date.now()
     });
-    document.getElementById("msgInput").value = "";
+    msgInput.value = "";
   }
 });
 
+// メッセージ受信
 messagesRef.on("child_added", (snapshot) => {
   const msg = snapshot.val();
   const li = document.createElement("li");
-  li.textContent = `[${msg.user}] ${msg.text}`;
-  document.getElementById("messages").appendChild(li);
+  li.textContent = msg.text;
+  messagesList.appendChild(li);
 });
