@@ -1,34 +1,44 @@
 <!doctype html>
-<html lang="ja"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>プレイ| デスノート人狼（非公式）</title>
-<link rel="stylesheet" href="assets/css/style.css">
-<script defer src="assets/config.js"></script>
-<script defer src="assets/script.js"></script>
-</head><body>
-
-<div class="nav"><div class="nav-inner">
- <div class="brand"><div class="logo">DN</div><div class="title">デスノート人狼（非公式）</div></div>
- <details class="nav-accordion">
-  <summary>メニュー</summary> 
-  <div class="menu">
-    <a class="button" href="index.html"><strong>トップ</strong></a>
-    <a class="button" href="rules.html"><strong>ルール</strong></a>
-    <a class="button" href="materials.html"><strong>配布物</strong></a>
-    <a class="button" href="samples.html"><strong>サンプルプレイ</strong></a>
-    <a class="button" href="play.html"><strong>プレイ</strong></a>
-  </div>
- </details>
-</div></div>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>プレイ | デスノート人狼（非公式）</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script defer src="assets/config.js"></script>
+  <script defer src="assets/script.js"></script>
+</head>
 <body>
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo">DN</div>
+        <div class="title">デスノート人狼（非公式）</div>
+      </div>
+      <details class="nav-accordion">
+        <summary>メニュー</summary> 
+        <div class="menu">
+          <a class="button" href="index.html"><strong>トップ</strong></a>
+          <a class="button" href="rules.html"><strong>ルール</strong></a>
+          <a class="button" href="materials.html"><strong>配布物</strong></a>
+          <a class="button" href="samples.html"><strong>サンプルプレイ</strong></a>
+          <a class="button" href="play.html"><strong>プレイ</strong></a>
+        </div>
+      </details>
+    </div>
+  </div>
+
   <h1>部屋チャット</h1>
   <ul id="messages"></ul>
   <input id="msgInput" placeholder="メッセージを入力">
   <button id="sendBtn">送信</button>
 
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- 自作スクリプト -->
   <script src="assets/js/firebase-config.js"></script>
   <script src="assets/js/chat.js"></script>
 </body>
+</html>
