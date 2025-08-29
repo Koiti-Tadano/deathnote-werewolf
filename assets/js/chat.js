@@ -52,3 +52,25 @@ messagesRef.on("child_added", (snapshot) => {
   li.appendChild(textSpan);
   messagesList.appendChild(li);
 });
+
+// モーダル要素
+const modal = document.getElementById("rulesModal");
+const openBtn = document.getElementById("openRules");
+const closeBtn = document.getElementById("closeRules");
+
+// 「ルールを参照」をクリック
+openBtn.addEventListener("click", () => {
+  modal.style.display = "block";
+});
+
+// 「×」をクリック
+closeBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+// 背景クリックでも閉じる
+window.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+});
