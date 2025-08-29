@@ -46,13 +46,29 @@
 <div id="rulesModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" id="closeRules">&times;</span>
-<h2>ルール</h2>
-    <div class="rules-body">
-      <!-- ここに rules.html の本文を読み込む or 簡易的にコピーしておく -->
-      <p>あ</p>
+    <h2>ルール</h2>
+    <div id="rulesContent" class="rules-body">
+      <!-- ここに rules.html をJSで読み込んで表示 -->
     </div>
   </div>
 </div>
+
+<script>
+document.getElementById("openRules").addEventListener("click", async () => {
+  try {
+    const res = await fetch("rules.html");      // rules.htmlを取得
+    const text = await res.text();              // 中身を文字列で読む
+    document.getElementById("rulesContent").innerHTML = text; // モーダルに差し込む
+    document.getElementById("rulesModal").style.display = "block"; // モーダル表示
+  } catch (e) {
+    document.getElementById("rulesContent").innerHTML = "<p>ルールを読み込めませんでした。</p>";
+  }
+});
+
+document.getElementById("closeRules").addEventListener("click", () => {
+  document.getElementById("rulesModal").style.display = "none";
+});
+</script>
 
 
 </body>
