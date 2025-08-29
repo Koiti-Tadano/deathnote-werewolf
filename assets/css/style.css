@@ -207,3 +207,13 @@ small{color:var(--muted)}
   font-size: 20px;
   cursor: pointer;
 }
+
+/* モーダル内の文字は白にする */
+#rulesModal .rules-body {
+  color: #fff;
+  background: #111; /* 背景も少し明るい黒にして読みやすく */
+  padding: 16px;
+  border-radius: 8px;
+  max-height: 80vh;   /* 画面からはみ出さないように */
+  overflow-y: auto;   /* スクロール可能にする */
+}
