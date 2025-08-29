@@ -74,3 +74,44 @@ window.addEventListener("click", (e) => {
     modal.style.display = "none";
   }
 });
+
+
+
+
+
+<script>
+document.getElementById("sendBtn").addEventListener("click", async () => {
+  const roomId = localStorage.getItem("roomId");
+  const playerName = localStorage.getItem("playerName") || "名無し";
+  const text = document.getElementById("msgInput").value.trim();
+
+  if (!text) {
+    alert("メッセージを入力してください");
+    return;
+  }
+
+  const messagesRef = firebase.database().ref("rooms/" + roomId + "/messages");
+
+  try {
+    // Firebaseに書き込む
+    await messagesRef.push({
+      name: playerName,
+      text: text,
+      time: Date.now()
+    });
+
+    console.log("✅ Firebaseに書き込み成功！");
+
+    // 書き込んだ内容をすぐに確認
+    messagesRef.once('value').then(snapshot => {
+      console.log("💬 ルームの現在のメッセージ一覧：", snapshot.val());
+    });
+
+    // 入力欄を空にする
+    document.getElementById("msgInput").value = "";
+  } catch (err) {
+    console.error("❌ Firebase書き込みに失敗：", err);
+    alert("書き込み失敗！コンソールを確認してください。");
+  }
+});
+</script>
