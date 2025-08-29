@@ -217,3 +217,12 @@ small{color:var(--muted)}
   max-height: 80vh;   /* 画面からはみ出さないように */
   overflow-y: auto;   /* スクロール可能にする */
 }
+
+#rulesModal h2 {
+  color: #000; /* タイトルは黒文字 */
+  margin-top: 0;
+}
+
+#rulesModal .rules-note {
+  color: #ff00ff; /* 注意書きはピンクとかに */
+}
