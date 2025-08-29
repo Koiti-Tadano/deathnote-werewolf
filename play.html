@@ -8,7 +8,36 @@
 <script defer src="assets/script.js"></script>
 </head><body>
 
-<div class="nav"><div class="nav-inner">
+<button id="createRoomBtn">新しいルームを作成</button>
+<p>ルームID: <span id="roomIdDisplay"></span></p>
+
+<script>
+// ランダムなルームIDを生成する関数
+function generateRoomId(length = 8) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let id = "";
+  for (let i = 0; i < length; i++) {
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return id;
+}
+
+document.getElementById("createRoomBtn").addEventListener("click", () => {
+  const newRoomId = generateRoomId(); // 例: "a9kz12xq"
+  
+  // Firebaseの rooms/{id} に空のルームを作っておく（任意）
+  firebase.database().ref("rooms/" + newRoomId).set({
+    createdAt: Date.now()
+  });
+
+  // 画面に表示
+  document.getElementById("roomIdDisplay").textContent = newRoomId;
+  
+  alert("このルームIDをコピーして、参加者に共有してください: " + newRoomId);
+});
+</script> 
+
+ <div class="nav"><div class="nav-inner">
  <div class="brand"><div class="logo">DN</div><div class="title">デスノート人狼（非公式）</div></div>
  <details class="nav-accordion">
   <summary>メニュー</summary> 
