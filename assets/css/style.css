@@ -122,7 +122,7 @@ small{color:var(--muted)}
 
 /* チャット全体の枠 */
 #chatBox {
-  background-color: #fff;   /* 白背景 */
+  background-color: #e2e2e2;   /* 白背景 */
   color: #000;              /* 黒文字 */
   border: 1px solid #ccc;
   padding: 10px;
