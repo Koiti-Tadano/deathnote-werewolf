@@ -19,11 +19,23 @@
        <summary>メニュー</summary> 
   <div class="menu">
         <a class="button" href="index.html"><strong>ゲームを終了</strong></a>
-          <a class="button" href="rules.html"><strong>ルールを参照</strong></a>
+          <button a class="button" id="openRules"><strong>ルールを参照</strong></a>
   </div>
       </details>
     </div>
   </div>
+
+<!-- モーダル（非表示のルール画面） -->
+<div id="rulesModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeRules">&times;</span>
+    <h2>ルール</h2>
+    <div class="rules-body">
+      <!-- ここに rules.html の本文を読み込む or 簡易的にコピーしておく -->
+      <p>ここにルールの内容が表示されます。</p>
+    </div>
+  </div>
+</div>
 
 <h1>部屋チャット</h1>
 <div id="roomInfo"></div>  <!-- ルームID表示用 -->
