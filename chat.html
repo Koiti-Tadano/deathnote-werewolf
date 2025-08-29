@@ -25,6 +25,23 @@
     </div>
   </div>
 
+<h1>部屋チャット</h1>
+<div id="roomInfo"></div>  <!-- ルームID表示用 -->
+
+<div id="chatBox">
+  <ul id="messages"></ul>
+</div>
+<input id="msgInput" placeholder="メッセージを入力">
+<button id="sendBtn">送信</button>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- 自作スクリプト -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/chat.js"></script>
+
 <!-- モーダル（非表示のルール画面） -->
 <div id="rulesModal" class="modal">
   <div class="modal-content">
@@ -189,21 +206,6 @@
   </div>
 </div>
 
-<h1>部屋チャット</h1>
-<div id="roomInfo"></div>  <!-- ルームID表示用 -->
 
-<div id="chatBox">
-  <ul id="messages"></ul>
-</div>
-<input id="msgInput" placeholder="メッセージを入力">
-<button id="sendBtn">送信</button>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-  <!-- 自作スクリプト -->
-  <script src="assets/js/firebase-config.js"></script>
-  <script src="assets/js/chat.js"></script>
 </body>
 </html>
