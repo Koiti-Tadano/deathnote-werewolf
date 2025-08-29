@@ -8,11 +8,16 @@
 <script defer src="assets/script.js"></script>
 </head><body>
 
+<!-- ルーム作成 -->
 <button id="createRoomBtn">新しいルームを作成</button>
-<p>ルームID: <span id="roomIdDisplay"></span></p>
+<p>あなたのルームID: <span id="roomIdDisplay"></span></p>
+
+<!-- ルーム参加 -->
+<input type="text" id="joinRoomInput" placeholder="ルームIDを入力">
+<button id="joinRoomBtn">参加</button>
 
 <script>
-// ランダムなルームIDを生成する関数
+// ランダムなルームID生成
 function generateRoomId(length = 8) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   let id = "";
@@ -22,20 +27,33 @@ function generateRoomId(length = 8) {
   return id;
 }
 
+// ルーム作成
 document.getElementById("createRoomBtn").addEventListener("click", () => {
-  const newRoomId = generateRoomId(); // 例: "a9kz12xq"
-  
-  // Firebaseの rooms/{id} に空のルームを作っておく（任意）
+  const newRoomId = generateRoomId();
+
+  // Firebaseにルーム情報を登録（createdAtだけでもOK）
   firebase.database().ref("rooms/" + newRoomId).set({
     createdAt: Date.now()
   });
 
-  // 画面に表示
+  // 表示
   document.getElementById("roomIdDisplay").textContent = newRoomId;
-  
-  alert("このルームIDをコピーして、参加者に共有してください: " + newRoomId);
+  alert("ルームIDをコピーして参加者に共有してください: " + newRoomId);
 });
-</script> 
+
+// ルーム参加
+document.getElementById("joinRoomBtn").addEventListener("click", () => {
+  const roomId = document.getElementById("joinRoomInput").value.trim();
+  if (!roomId) {
+    alert("ルームIDを入力してください！");
+    return;
+  }
+
+  // ここでチャット画面に移動するなどの処理を追加
+  // 例えば: window.location.href = `chat.html?room=${roomId}`;
+  alert("ルームに参加しました！ ID: " + roomId);
+});
+</script>
 
  <div class="nav"><div class="nav-inner">
  <div class="brand"><div class="logo">DN</div><div class="title">デスノート人狼（非公式）</div></div>
