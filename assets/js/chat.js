@@ -1,6 +1,14 @@
-// assets/js/chat.js
 const db = firebase.database();
-const messagesRef = db.ref("messages");
+
+// プレイヤー情報を取得
+const playerName = localStorage.getItem("playerName") || "名無し";
+const roomId = localStorage.getItem("roomId") || "未設定";
+
+// ルームIDを表示
+document.getElementById("roomInfo").textContent = "ルームID: " + roomId;
+
+// メッセージ参照（ルームごとに分ける）
+const messagesRef = db.ref("rooms/" + roomId + "/messages");
 
 const msgInput = document.getElementById("msgInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -12,6 +20,7 @@ sendBtn.addEventListener("click", () => {
   if (text.trim() !== "") {
     messagesRef.push({
       text: text,
+      name: playerName,
       time: Date.now()
     });
     msgInput.value = "";
@@ -21,7 +30,25 @@ sendBtn.addEventListener("click", () => {
 // メッセージ受信
 messagesRef.on("child_added", (snapshot) => {
   const msg = snapshot.val();
+
   const li = document.createElement("li");
-  li.textContent = msg.text;
+
+  // アイコン（頭文字を丸で表示する例）
+  const icon = document.createElement("div");
+  icon.className = "message-icon";
+  icon.textContent = msg.name ? msg.name.charAt(0) : "?";
+
+  // 名前
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "message-name";
+  nameSpan.textContent = msg.name || "名無し";
+
+  // 本文
+  const textSpan = document.createElement("span");
+  textSpan.textContent = msg.text;
+
+  li.appendChild(icon);
+  li.appendChild(nameSpan);
+  li.appendChild(textSpan);
   messagesList.appendChild(li);
 });
