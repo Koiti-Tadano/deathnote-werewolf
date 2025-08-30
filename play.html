@@ -41,6 +41,9 @@ document.getElementById("createRoomBtn").addEventListener("click", () => {
   alert("ルームIDをコピーして参加者に共有してください: " + newRoomId);
 });
 
+// 作った本人を自動でチャットに入れる
+window.location.href = `chat.html?room=${newRoomId}`;
+
 // ルーム参加
 document.getElementById("joinRoomBtn").addEventListener("click", () => {
   const roomId = document.getElementById("joinRoomInput").value.trim();
