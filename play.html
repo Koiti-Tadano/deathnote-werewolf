@@ -2,21 +2,56 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>テスト</title>
+  <title>ルーム選択</title>
+  <!-- Firebase SDK 読み込みを忘れずに！ -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    // ここに firebaseConfig を記述して初期化
+    firebase.initializeApp(firebaseConfig);
+  </script>
 </head>
 <body>
+  <!-- ルーム作成 -->
   <button id="createRoomBtn">新しいルームを作成</button>
   <p>あなたのルームID: <span id="roomIdDisplay"></span></p>
 
+  <!-- ルーム参加 -->
+  <input type="text" id="joinRoomInput" placeholder="ルームIDを入力">
+  <button id="joinRoomBtn">参加</button>
+
   <script>
-    console.log("✅ スクリプトは読み込まれたよ");
+    function generateRoomId(length = 8) {
+      const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+      let id = "";
+      for (let i = 0; i < length; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return id;
+    }
 
-    const btn = document.getElementById("createRoomBtn");
-    console.log("✅ ボタン要素:", btn);
+    // ルーム作成
+    document.getElementById("createRoomBtn").addEventListener("click", () => {
+      console.log("✅ ルーム作成ボタンが押された！");
+      const newRoomId = generateRoomId();
+      console.log("✅ 新しいルームID:", newRoomId);
 
-    btn.addEventListener("click", () => {
-      console.log("✅ ボタンが押された！");
-      document.getElementById("roomIdDisplay").textContent = "テストID123";
+      firebase.database().ref("rooms/" + newRoomId).set({
+        createdAt: Date.now()
+      });
+
+      document.getElementById("roomIdDisplay").textContent = newRoomId;
+      window.location.href = `chat.html?room=${newRoomId}`;
+    });
+
+    // ルーム参加
+    document.getElementById("joinRoomBtn").addEventListener("click", () => {
+      const roomId = document.getElementById("joinRoomInput").value.trim();
+      if (!roomId) {
+        alert("ルームIDを入力してください！");
+        return;
+      }
+      window.location.href = `chat.html?room=${roomId}`;
     });
   </script>
 </body>
