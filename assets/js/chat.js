@@ -1,34 +1,33 @@
 const db = firebase.database();
 
-// URLからroomIdを取得
-const urlParams = new URLSearchParams(window.location.search);
-const roomId = urlParams.get("room") || "defaultRoom"; 
+// URLパラメータ取得
+const params   = new URLSearchParams(window.location.search);
+const roomId   = params.get("room") || "defaultRoom";
+const urlName  = params.get("name");
 
-// プレイヤー情報
-const playerName = localStorage.getItem("playerName") || "名無し";
+// プレイヤー名の決定（URL > localStorage > 既定値）
+let playerName = urlName || localStorage.getItem("playerName") || "名無し";
+// URLで来たら上書き保存（次回以降も反映されるように）
+if (urlName) localStorage.setItem("playerName", urlName);
 
-// ルームIDを表示（chat.htmlに <div id="roomInfo"></div> を用意しておく）
-document.getElementById("roomInfo").textContent = "ルームID: " + roomId;
+// 表示（chat.html に #roomInfo と #playerInfo を用意しておくと便利）
+const roomInfoEl   = document.getElementById("roomInfo");
+const playerInfoEl = document.getElementById("playerInfo");
+if (roomInfoEl)   roomInfoEl.textContent   = "ルームID: " + roomId;
+if (playerInfoEl) playerInfoEl.textContent = "あなた: " + playerName;
 
-// メッセージ参照（ルームごとに分ける）
+// メッセージ参照
 const messagesRef = db.ref("rooms/" + roomId + "/messages");
 
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
-const messagesList = document.getElementById("messages");
-
-// メッセージ送信
+// 送信
 sendBtn.addEventListener("click", () => {
   const text = msgInput.value;
-  if (text.trim() !== "") {
-    messagesRef.push({
-      text: text,
-      name: playerName,
-      time: Date.now()
-    });
-    msgInput.value = "";
-  }
+  if (text.trim() === "") return;
+  messagesRef.push({ text, name: playerName, time: Date.now() });
+  msgInput.value = "";
 });
+
+// 受信（省略部分そのままでOK）
 
 // メッセージ受信
 messagesRef.on("child_added", (snapshot) => {
