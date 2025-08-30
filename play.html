@@ -89,8 +89,9 @@ document.getElementById("createRoomBtn").addEventListener("click", () => {
   document.getElementById("copyRoomIdBtn").style.display = "inline-block";
 
   // 作った本人を自動でチャットに入れる
-  window.location.href = `chat.html?room=${newRoomId}`;
+  window.location.href = `chat.html?room=${newRoomId}&name=${encodeURIComponent(playerName)}`;
 });
+
 
 // ルーム参加
 document.getElementById("joinRoomBtn").addEventListener("click", () => {
@@ -104,7 +105,7 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
 
   localStorage.setItem("playerName", playerName);
 
-  window.location.href = `chat.html?room=${roomId}`;
+  window.location.href = `chat.html?room=${roomId}&name=${encodeURIComponent(playerName)}`;
 });
 
 // コピー機能
