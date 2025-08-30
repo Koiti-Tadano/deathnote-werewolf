@@ -38,20 +38,7 @@ messagesRef.on("child_added", (snapshot) => {
   icon.className = "message-icon";
   icon.textContent = msg.name ? msg.name.charAt(0) : "?";
 
-  icon.addEventListener("click", () => {
-  const confirmChat = confirm(`${msg.name} と個別チャットしますか？`);
-  if (confirmChat) {
-    // 個別ルームIDを生成して移動
-    const myName = localStorage.getItem("playerName");
-    const targetName = msg.name;
-
-    // 2人の名前から一意なIDを生成（順番関係なし）
-    const sorted = [myName, targetName].sort();
-    const privateRoomId = roomId + "_" + sorted.join("_");
-
-    window.open(`chat.html?room=${privateRoomId}&private=1`, "_blank");
-  }
-});
+  
 
   // 名前
   const nameSpan = document.createElement("span");
