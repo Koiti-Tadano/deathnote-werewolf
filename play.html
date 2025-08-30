@@ -16,45 +16,7 @@
 <input type="text" id="joinRoomInput" placeholder="ルームIDを入力">
 <button id="joinRoomBtn">参加</button>
 
-<script>
-// ランダムなルームID生成
-function generateRoomId(length = 8) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let id = "";
-  for (let i = 0; i < length; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return id;
-}
 
-// ルーム作成
-document.getElementById("createRoomBtn").addEventListener("click", () => {
-  const newRoomId = generateRoomId();
-
-  // Firebaseにルーム情報を登録（createdAtだけでもOK）
-  firebase.database().ref("rooms/" + newRoomId).set({
-    createdAt: Date.now()
-  });
-
-  // 表示
-  document.getElementById("roomIdDisplay").textContent = newRoomId;
-
-  // 作った本人を自動でチャットに入れる ← ここに移動！
-  window.location.href = `chat.html?room=${newRoomId}`;
-});
-
-// ルーム参加
-document.getElementById("joinRoomBtn").addEventListener("click", () => {
-  const roomId = document.getElementById("joinRoomInput").value.trim();
-  if (!roomId) {
-    alert("ルームIDを入力してください！");
-    return;
-  }
-
-  // ここでチャット画面に移動する
-  window.location.href = `chat.html?room=${roomId}`;
-});
-</script>
 
  <div class="nav"><div class="nav-inner">
  <div class="brand"><div class="logo">DN</div><div class="title">デスノート人狼（非公式）</div></div>
@@ -93,5 +55,44 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
       window.location.href = "chat.html?room=" + encodeURIComponent(room);
     }
   </script>
+  <script>
+// ランダムなルームID生成
+function generateRoomId(length = 8) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let id = "";
+  for (let i = 0; i < length; i++) {
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return id;
+}
+
+// ルーム作成
+document.getElementById("createRoomBtn").addEventListener("click", () => {
+  const newRoomId = generateRoomId();
+
+  // Firebaseにルーム情報を登録（createdAtだけでもOK）
+  firebase.database().ref("rooms/" + newRoomId).set({
+    createdAt: Date.now()
+  });
+
+  // 表示
+  document.getElementById("roomIdDisplay").textContent = newRoomId;
+
+  // 作った本人を自動でチャットに入れる ← ここに移動！
+  window.location.href = `chat.html?room=${newRoomId}`;
+});
+
+// ルーム参加
+document.getElementById("joinRoomBtn").addEventListener("click", () => {
+  const roomId = document.getElementById("joinRoomInput").value.trim();
+  if (!roomId) {
+    alert("ルームIDを入力してください！");
+    return;
+  }
+
+  // ここでチャット画面に移動する
+  window.location.href = `chat.html?room=${roomId}`;
+});
+</script>
   </div></div>
 </body>
