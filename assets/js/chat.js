@@ -1,10 +1,13 @@
 const db = firebase.database();
 
-// プレイヤー情報を取得
-const playerName = localStorage.getItem("playerName") || "名無し";
-const roomId = localStorage.getItem("roomId") || "未設定";
+// URLからroomIdを取得
+const urlParams = new URLSearchParams(window.location.search);
+const roomId = urlParams.get("room") || "defaultRoom"; 
 
-// ルームIDを表示
+// プレイヤー情報
+const playerName = localStorage.getItem("playerName") || "名無し";
+
+// ルームIDを表示（chat.htmlに <div id="roomInfo"></div> を用意しておく）
 document.getElementById("roomInfo").textContent = "ルームID: " + roomId;
 
 // メッセージ参照（ルームごとに分ける）
