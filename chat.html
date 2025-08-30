@@ -28,6 +28,23 @@ const roomId = urlParams.get("room") || "defaultRoom"; // パラメータがな�
     </div>
   </div>
 
+<script>
+document.getElementById("openRules").addEventListener("click", async () => {
+  try {
+    const res = await fetch("rules.html");      // rules.htmlを取得
+    const text = await res.text();              // 中身を文字列で読む
+    document.getElementById("rulesContent").innerHTML = text; // モーダルに差し込む
+    document.getElementById("rulesModal").style.display = "block"; // モーダル表示
+  } catch (e) {
+    document.getElementById("rulesContent").innerHTML = "<p>ルールを読み込めませんでした。</p>";
+  }
+});
+
+document.getElementById("closeRules").addEventListener("click", () => {
+  document.getElementById("rulesModal").style.display = "none";
+});
+</script>
+  
 <h1>部屋チャット</h1>
 <div id="roomInfo"></div>  <!-- ルームID表示用 -->
 
@@ -58,22 +75,7 @@ const roomId = urlParams.get("room") || "defaultRoom"; // パラメータがな�
   </div>
 </div>
 
-<script>
-document.getElementById("openRules").addEventListener("click", async () => {
-  try {
-    const res = await fetch("rules.html");      // rules.htmlを取得
-    const text = await res.text();              // 中身を文字列で読む
-    document.getElementById("rulesContent").innerHTML = text; // モーダルに差し込む
-    document.getElementById("rulesModal").style.display = "block"; // モーダル表示
-  } catch (e) {
-    document.getElementById("rulesContent").innerHTML = "<p>ルールを読み込めませんでした。</p>";
-  }
-});
 
-document.getElementById("closeRules").addEventListener("click", () => {
-  document.getElementById("rulesModal").style.display = "none";
-});
-</script>
 
 
 </body>
