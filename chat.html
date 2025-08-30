@@ -1,9 +1,6 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  // URLからroomパラメータを取得
-const urlParams = new URLSearchParams(window.location.search);
-const roomId = urlParams.get("room") || "defaultRoom"; // パラメータがなければ全体ルーム
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>プレイ | デスノート人狼（非公式）</title>
@@ -27,8 +24,12 @@ const roomId = urlParams.get("room") || "defaultRoom"; // パラメータがな�
       </details>
     </div>
   </div>
-
+    
 <script>
+    // URLからroomパラメータを取得
+const urlParams = new URLSearchParams(window.location.search);
+const roomId = urlParams.get("room") || "defaultRoom"; // パラメータがなければ全体ルーム
+  <meta charset="utf-8">
 document.getElementById("openRules").addEventListener("click", async () => {
   try {
     const res = await fetch("rules.html");      // rules.htmlを取得
