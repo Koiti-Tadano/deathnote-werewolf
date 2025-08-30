@@ -38,11 +38,10 @@ document.getElementById("createRoomBtn").addEventListener("click", () => {
 
   // 表示
   document.getElementById("roomIdDisplay").textContent = newRoomId;
-  alert("ルームIDをコピーして参加者に共有してください: " + newRoomId);
-});
 
-// 作った本人を自動でチャットに入れる
-window.location.href = `chat.html?room=${newRoomId}`;
+  // 作った本人を自動でチャットに入れる ← ここに移動！
+  window.location.href = `chat.html?room=${newRoomId}`;
+});
 
 // ルーム参加
 document.getElementById("joinRoomBtn").addEventListener("click", () => {
@@ -52,9 +51,8 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
     return;
   }
 
-  // ここでチャット画面に移動するなどの処理を追加
-   window.location.href = `chat.html?room=${roomId}`;
-  alert("ルームに参加しました！ ID: " + roomId);
+  // ここでチャット画面に移動する
+  window.location.href = `chat.html?room=${roomId}`;
 });
 </script>
 
