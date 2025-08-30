@@ -1,79 +1,23 @@
-<!doctype html>
-<html lang="ja"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>プレイ| デスノート人狼（非公式）</title>
-<link rel="stylesheet" href="assets/css/style.css">
-<script defer src="assets/config.js"></script>
-<script defer src="assets/script.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>テスト</title>
 </head>
- <body>
+<body>
+  <button id="createRoomBtn">新しいルームを作成</button>
+  <p>あなたのルームID: <span id="roomIdDisplay"></span></p>
 
- <div class="nav"><div class="nav-inner">
- <div class="brand"><div class="logo">DN</div><div class="title">デスノート人狼（非公式）</div></div>
- <details class="nav-accordion">
-  <summary>メニュー</summary> 
-  <div class="menu">
-    <a class="button" href="index.html"><strong>トップ</strong></a>
-    <a class="button" href="rules.html"><strong>ルール</strong></a>
-    <a class="button" href="materials.html"><strong>配布物</strong></a>
-    <a class="button" href="samples.html"><strong>サンプルプレイ</strong></a>
-    <a class="button" href="play.html"><strong>プレイ</strong></a>
-  </div>
- </details>
-</div></div>
+  <script>
+    console.log("✅ スクリプトは読み込まれたよ");
 
-<!-- ルーム作成 -->
-<h2>ルーム作成</h2>
-<button id="createRoomBtn">新しいルームを作る</button>
-<p>あなたのルームID: <span id="roomIdDisplay"></span></p> 
-<div class="wrapper">
-  <div class="center-box"> 
-  <h1>部屋に入る</h1>
-  <label>プレイヤー名: <input id="playerName"></label><br>
-  <label>ルームID: <input id="roomId"></label><br>
-  <button onclick="enterRoom()">入室</button>
+    const btn = document.getElementById("createRoomBtn");
+    console.log("✅ ボタン要素:", btn);
 
-  
-  </div></div>
-   <script>
-    // ランダムなルームID生成
-    function generateRoomId(length = 8) {
-      const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-      let id = "";
-      for (let i = 0; i < length; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return id;
-    }
-
-    // ルーム作成
-    document.getElementById("createRoomBtn").addEventListener("click", () => {
-      console.log("✅ ルーム作成ボタンが押された！"); // 確認ログ
-
-      const newRoomId = generateRoomId();
-      console.log("✅ 新しいルームID:", newRoomId);
-
-      // Firebaseにルーム情報を登録
-      firebase.database().ref("rooms/" + newRoomId).set({
-        createdAt: Date.now()
-      });
-
-      // 表示
-      document.getElementById("roomIdDisplay").textContent = newRoomId;
-
-      // 作った本人を自動でチャットに入れる
-      window.location.href = `chat.html?room=${newRoomId}`;
-    });
-
-    // ルーム参加
-    document.getElementById("joinRoomBtn").addEventListener("click", () => {
-      const roomId = document.getElementById("joinRoomInput").value.trim();
-      if (!roomId) {
-        alert("ルームIDを入力してください！");
-        return;
-      }
-      window.location.href = `chat.html?room=${roomId}`;
+    btn.addEventListener("click", () => {
+      console.log("✅ ボタンが押された！");
+      document.getElementById("roomIdDisplay").textContent = "テストID123";
     });
   </script>
 </body>
+</html>
