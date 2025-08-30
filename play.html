@@ -32,7 +32,7 @@
  </details>
 </div></div>
 
-<body>  
+ 
 <div class="wrapper">
   <div class="center-box"> 
   <h1>部屋に入る</h1>
@@ -40,61 +40,46 @@
   <label>ルームID: <input id="roomId"></label><br>
   <button onclick="enterRoom()">入室</button>
 
-  <script>
-    function enterRoom() {
-      const name = document.getElementById("playerName").value;
-      const room = document.getElementById("roomId").value;
-      if (!name || !room) {
-        alert("名前とルームIDを入力してください");
+  
+  </div></div>
+   <script>
+    // ランダムなルームID生成
+    function generateRoomId(length = 8) {
+      const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+      let id = "";
+      for (let i = 0; i < length; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return id;
+    }
+
+    // ルーム作成
+    document.getElementById("createRoomBtn").addEventListener("click", () => {
+      console.log("✅ ルーム作成ボタンが押された！"); // 確認ログ
+
+      const newRoomId = generateRoomId();
+      console.log("✅ 新しいルームID:", newRoomId);
+
+      // Firebaseにルーム情報を登録
+      firebase.database().ref("rooms/" + newRoomId).set({
+        createdAt: Date.now()
+      });
+
+      // 表示
+      document.getElementById("roomIdDisplay").textContent = newRoomId;
+
+      // 作った本人を自動でチャットに入れる
+      window.location.href = `chat.html?room=${newRoomId}`;
+    });
+
+    // ルーム参加
+    document.getElementById("joinRoomBtn").addEventListener("click", () => {
+      const roomId = document.getElementById("joinRoomInput").value.trim();
+      if (!roomId) {
+        alert("ルームIDを入力してください！");
         return;
       }
-      // プレイヤー名を保存
-      localStorage.setItem("playerName", name);
-      localStorage.setItem("roomId", room);
-      // chat.htmlに移動
-      window.location.href = "chat.html?room=" + encodeURIComponent(room);
-    }
+      window.location.href = `chat.html?room=${roomId}`;
+    });
   </script>
-  <script>
-// ランダムなルームID生成
-function generateRoomId(length = 8) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let id = "";
-  for (let i = 0; i < length; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return id;
-}
-
-// ルーム作成
-document.getElementById("createRoomBtn").addEventListener("click", () => {
-console.log("✅ ルーム作成ボタンが押された！"); // ← 確認ログ
- const newRoomId = generateRoomId();
-console.log("✅ 新しいルームID:", newRoomId);  // ← 確認ログ
- 
-  // Firebaseにルーム情報を登録（createdAtだけでもOK）
-  firebase.database().ref("rooms/" + newRoomId).set({
-    createdAt: Date.now()
-  });
-
-  // 表示
-  document.getElementById("roomIdDisplay").textContent = newRoomId;
-
-  // 作った本人を自動でチャットに入れる ← ここに移動！
-  window.location.href = `chat.html?room=${newRoomId}`;
-});
-
-// ルーム参加
-document.getElementById("joinRoomBtn").addEventListener("click", () => {
-  const roomId = document.getElementById("joinRoomInput").value.trim();
-  if (!roomId) {
-    alert("ルームIDを入力してください！");
-    return;
-  }
-
-  // ここでチャット画面に移動する
-  window.location.href = `chat.html?room=${roomId}`;
-});
-</script>
-  </div></div>
 </body>
