@@ -68,8 +68,10 @@ function generateRoomId(length = 8) {
 
 // ルーム作成
 document.getElementById("createRoomBtn").addEventListener("click", () => {
-  const newRoomId = generateRoomId();
-
+console.log("✅ ルーム作成ボタンが押された！"); // ← 確認ログ
+ const newRoomId = generateRoomId();
+console.log("✅ 新しいルームID:", newRoomId);  // ← 確認ログ
+ 
   // Firebaseにルーム情報を登録（createdAtだけでもOK）
   firebase.database().ref("rooms/" + newRoomId).set({
     createdAt: Date.now()
