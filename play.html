@@ -69,34 +69,53 @@
     return id;
   }
 
-  // ルーム作成
-  document.getElementById("createRoomBtn").addEventListener("click", () => {
-    console.log("✅ ルーム作成ボタンが押された！");
+// ルーム作成
+document.getElementById("createRoomBtn").addEventListener("click", () => {
+  const playerName = document.getElementById("playerNameInput").value.trim();
+  if (!playerName) {
+    alert("プレイヤー名を入力してください！");
+    return;
+  }
 
-    const newRoomId = generateRoomId();
-    console.log("✅ 新しいルームID:", newRoomId);
+  localStorage.setItem("playerName", playerName);
 
-    // Firebaseにルーム情報を登録
-    firebase.database().ref("rooms/" + newRoomId).set({
-      createdAt: Date.now()
+  const newRoomId = generateRoomId();
+
+  firebase.database().ref("rooms/" + newRoomId).set({
+    createdAt: Date.now()
+  });
+
+  document.getElementById("roomIdDisplay").textContent = newRoomId;
+  document.getElementById("copyRoomIdBtn").style.display = "inline-block";
+
+  // 作った本人を自動でチャットに入れる
+  window.location.href = `chat.html?room=${newRoomId}`;
+});
+
+// ルーム参加
+document.getElementById("joinRoomBtn").addEventListener("click", () => {
+  const playerName = document.getElementById("playerNameInput").value.trim();
+  const roomId = document.getElementById("joinRoomInput").value.trim();
+
+  if (!playerName || !roomId) {
+    alert("名前とルームIDを入力してください！");
+    return;
+  }
+
+  localStorage.setItem("playerName", playerName);
+
+  window.location.href = `chat.html?room=${roomId}`;
+});
+
+// コピー機能
+document.getElementById("copyRoomIdBtn").addEventListener("click", () => {
+  const roomId = document.getElementById("roomIdDisplay").textContent;
+  if (roomId) {
+    navigator.clipboard.writeText(roomId).then(() => {
+      alert("ルームIDをコピーしました: " + roomId);
     });
-
-    // 表示
-    document.getElementById("roomIdDisplay").textContent = newRoomId;
-
-    // 自動でチャットに入る
-    window.location.href = `chat.html?room=${newRoomId}`;
-  });
-
-  // ルーム参加
-  document.getElementById("joinRoomBtn").addEventListener("click", () => {
-    const roomId = document.getElementById("joinRoomInput").value.trim();
-    if (!roomId) {
-      alert("ルームIDを入力してください！");
-      return;
-    }
-    window.location.href = `chat.html?room=${roomId}`;
-  });
+  }
+});
 </script>
 
 </body>
