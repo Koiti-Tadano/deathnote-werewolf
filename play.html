@@ -52,6 +52,9 @@
 <h2>ルーム参加</h2>
 <input type="text" id="joinRoomInput" placeholder="ルームIDを入力">
 <button id="joinRoomBtn">参加</button>
+localStorage.setItem("roomId", newRoomId); //←追加
+window.location.href = `chat.html?room=${newRoomId}&name=${encodeURIComponent(playerName)}`;
+
 
 <!-- ルーム作成 -->
 <h2>ルーム作成</h2>
