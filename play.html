@@ -58,8 +58,10 @@
 <!-- ルーム作成 -->
 <h2>ルーム作成</h2>
 <button id="createRoomBtn">新しいルームを作る</button>
-<p>あなたのルームID: <span id="roomIdDisplay"></span></p> 
-
+<p>
+  あなたのルームID: <span id="roomIdDisplay"></span>
+  <button id="copyRoomIdBtn" style="display:none;">コピー</button>
+</p>
 <script>
   // ランダムなルームID生成
   function generateRoomId(length = 8) {
