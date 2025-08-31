@@ -52,8 +52,6 @@
 <h2>ルーム参加</h2>
 <input type="text" id="joinRoomInput" placeholder="ルームIDを入力">
 <button id="joinRoomBtn">参加</button>
-localStorage.setItem("roomId", newRoomId); //←追加
-window.location.href = `chat.html?room=${newRoomId}&name=${encodeURIComponent(playerName)}`;
 
 
 <!-- ルーム作成 -->
@@ -81,7 +79,7 @@ document.getElementById("createRoomBtn").addEventListener("click", () => {
   }
 
   localStorage.setItem("playerName", playerName);
-
+　localStorage.setItem("roomId", newRoomId);
   const newRoomId = generateRoomId();
 
   firebase.database().ref("rooms/" + newRoomId).set({
@@ -107,7 +105,7 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
   }
 
   localStorage.setItem("playerName", playerName);
-
+　localStorage.setItem("roomId", roomId);
   window.location.href = `chat.html?room=${roomId}&name=${encodeURIComponent(playerName)}`;
 });
 
