@@ -310,24 +310,24 @@ menu.appendChild(btnDetective);
     joined.forEach(name => messagesRef.push({ text: `${name} が入室しました。`, name: "システム", time: Date.now() }));
 
     // 人数不足チェック
-//    stateRef.once("value").then(stSnap => {
-//      const st = stSnap.val() || {};
-//      if (count < REQUIRED_PLAYERS) {
-//        if (!st.phasePaused) {
-//          const endAt = st.phaseEndAt || null;
-//          let remaining = null;
-//          if (endAt) remaining = Math.max(0, Math.floor((endAt - Date.now()) / 1000));
-//          stateRef.update({ phasePaused: true, pausedRemaining: remaining, phaseEndAt: null });
-//          messagesRef.push({ text: `人数が ${count} 人になったため一時停止。`, name: "システム", time: Date.now() });
-//        }
-//      } else {
-//        if (st.phasePaused && isGm) {
-//          const rem = st.pausedRemaining;
-//          const resume = (rem != null) ? rem : PHASE_LENGTHS[st.phase];
-//          const newEndAt = Date.now() + resume * 1000;
-//          stateRef.update({ phasePaused: false, phaseEndAt: newEndAt, pausedRemaining: null });
-//          messagesRef.push({ text: `人数が揃いました。ゲームを再開します。`, name: "システム", time: Date.now() });
-//        }
+    stateRef.once("value").then(stSnap => {
+      const st = stSnap.val() || {};
+      if (count < REQUIRED_PLAYERS) {
+        if (!st.phasePaused) {
+          const endAt = st.phaseEndAt || null;
+          let remaining = null;
+          if (endAt) remaining = Math.max(0, Math.floor((endAt - Date.now()) / 1000));
+          stateRef.update({ phasePaused: true, pausedRemaining: remaining, phaseEndAt: null });
+          messagesRef.push({ text: `人数が ${count} 人になったため一時停止。`, name: "システム", time: Date.now() });
+        }
+      } else {
+        if (st.phasePaused && isGm) {
+          const rem = st.pausedRemaining;
+          const resume = (rem != null) ? rem : PHASE_LENGTHS[st.phase];
+          const newEndAt = Date.now() + resume * 1000;
+          stateRef.update({ phasePaused: false, phaseEndAt: newEndAt, pausedRemaining: null });
+          messagesRef.push({ text: `人数が揃いました。ゲームを再開します。`, name: "システム", time: Date.now() });
+        }
       }
     });
   });
