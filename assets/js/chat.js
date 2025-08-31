@@ -190,87 +190,162 @@ menu.appendChild(btnDetective);
     anchorEl.parentElement.appendChild(menu);
   }
 
-  // --- フェーズ管理 ---
-  const PHASE_ORDER = ["morning", "day", "evening", "night"];
-  const PHASE_LENGTHS = {
-    morning: 60,       // 1分
-    day: 6 * 60,       // 6分
-    evening: 2 * 60,   // 2分
-    night: 2 * 60      // 2分
-  };
+// -----------------------------
+// Firebaseベースのフェーズ管理 & 人数制御
+// -----------------------------
 
-  let currentPhaseIndex = 0;
-  let currentDay = 1;
-  let phaseTimer = null;
+// 必要な参照（既に db, messagesRef がある前提）
+const stateRef = db.ref(`rooms/${roomId}/state`);
+const actionsRef = db.ref(`rooms/${roomId}/actions`);
+const playersListRef = db.ref(`rooms/${roomId}/players`);
 
-  function startPhase(phase, day) {
-    const length = PHASE_LENGTHS[phase];
-    const phaseLabel = { morning:"朝", day:"昼", evening:"夕方", night:"夜" }[phase];
+// 設定
+const REQUIRED_PLAYERS = 8; // GM含めて8人必要（変更可）
+const PHASE_ORDER = ["morning", "day", "evening", "night"];
+const PHASE_LENGTHS = { morning: 60, day: 6 * 60, evening: 2 * 60, night: 2 * 60 };
 
-    if (phaseInfoEl) phaseInfoEl.textContent = `Day ${day} — ${phaseLabel}`;
+// ローカル用タイマーID
+let localTimerInterval = null;
 
-    // システムメッセージ
-    if (phase === "morning") {
-      messagesRef.push({ text:`--- ${day}日目が始まりました ---`, name:"システム", time:Date.now() });
-      if (day === 1) {
-        messagesRef.push({ text:"初日はルール説明＆自己紹介をしてください。", name:"システム", time:Date.now() });
+// ヘルパー：GM 判定（ローカルストレージベース）
+const isGm = localStorage.getItem("isGm") === "true";
+
+// --- フェーズ開始をDBに保存する関数（GMが呼ぶ） ---
+function startPhaseInDB(phase, day, durationSec) {
+  const endAt = Date.now() + durationSec * 1000;
+  return stateRef.update({
+    phase: phase,
+    day: day,
+    phaseEndAt: endAt,
+    phasePaused: false,
+    pausedRemaining: null
+  });
+}
+
+// --- 次フェーズ（GMが呼ぶ） ---
+async function nextPhaseInDB(currentPhase, currentDay) {
+  const idx = PHASE_ORDER.indexOf(currentPhase);
+  const nextIdx = (idx + 1) % PHASE_ORDER.length;
+  const nextPhase = PHASE_ORDER[nextIdx];
+  const nextDay = (nextIdx === 0) ? (currentDay + 1) : currentDay;
+  const duration = PHASE_LENGTHS[nextPhase] || 60;
+  await startPhaseInDB(nextPhase, nextDay, duration);
+  // システムメッセージ（任意）
+  messagesRef.push({ text: `-- ${nextDay}日目 ${nextPhase} が始まりました --`, name: "システム", time: Date.now() });
+}
+
+// --- state の監視（全クライアント） ---
+// state: { phase, day, phaseEndAt, phasePaused, pausedRemaining }
+stateRef.on("value", (snap) => {
+  const s = snap.val() || {};
+  const phase = s.phase || "day";
+  const day = s.day || 1;
+  const phaseEndAt = s.phaseEndAt || null;
+  const phasePaused = s.phasePaused || false;
+  const pausedRemaining = s.pausedRemaining || null;
+
+  // UI 更新
+  const phaseLabel = { morning: "朝", day: "昼", evening: "夕方", night: "夜" }[phase] || phase;
+  if (phaseInfoEl) phaseInfoEl.textContent = `Day ${day} — ${phaseLabel}`;
+
+  // タイマー更新処理
+  if (localTimerInterval) {
+    clearInterval(localTimerInterval);
+    localTimerInterval = null;
+  }
+
+  if (phasePaused) {
+    if (phaseTimerEl) phaseTimerEl.textContent = "一時停止中（人数不足）";
+    return;
+  }
+
+  if (!phaseEndAt) {
+    if (phaseTimerEl) phaseTimerEl.textContent = "残り --";
+    return;
+  }
+
+  // カウントダウン開始（ローカルで描画）
+  function updateLocalTimer() {
+    const left = Math.max(0, Math.floor((phaseEndAt - Date.now()) / 1000));
+    if (phaseTimerEl) phaseTimerEl.textContent = `残り ${left}s`;
+    if (left <= 0) {
+      clearInterval(localTimerInterval);
+      localTimerInterval = null;
+      // フェーズ切替は GM のみが DB に書き込む
+      if (isGm) {
+        // 防止のため少しだけ待って DB の最終状態を確認してから次へ
+        stateRef.once("value").then(stateSnap => {
+          const st = stateSnap.val() || {};
+          // まだ終了していない場合だけ次へ
+          const endAtNow = st.phaseEndAt || 0;
+          if (!st.phasePaused && endAtNow && Date.now() >= endAtNow) {
+            nextPhaseInDB(st.phase || phase, st.day || day);
+          }
+        });
+      } else {
+        // 非GMは待機表示
+        if (phaseTimerEl) phaseTimerEl.textContent = "フェーズ終了待ち（GMが進行）";
       }
     }
+  }
 
-    // 行動完了ボタンを表示
-    actionBtn.style.display = "inline-block";
-    actionStatus.style.display = "none";
-    actionBtn.disabled = false;
-    actionBtn.textContent = (phase === "morning") ? "◯日目を始める" : "行動完了";
+  updateLocalTimer();
+  localTimerInterval = setInterval(updateLocalTimer, 500);
+});
 
-    // タイマー
-    if (phaseTimer) clearInterval(phaseTimer);
-    if (length > 0) {
-      let endTime = Date.now() + length * 1000;
-      function updateTimer() {
-        const left = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-        if (phaseTimerEl) phaseTimerEl.textContent = `残り ${left}s`;
-        if (left <= 0) {
-          clearInterval(phaseTimer);
-          nextPhase();
+// --- プレイヤー人数監視（全クライアント） ---
+// 目的：人数が足りなくなったら一時停止、復帰は GM が再開
+let prevPlayerKeys = [];
+
+playersListRef.on("value", (snap) => {
+  const obj = snap.val() || {};
+  const keys = Object.keys(obj);
+  const count = keys.length;
+
+  // 入退室ログの生成（差分）
+  const left = prevPlayerKeys.filter(k => !keys.includes(k));
+  const joined = keys.filter(k => !prevPlayerKeys.includes(k));
+  prevPlayerKeys = keys.slice(); // 保存
+
+  // 退室ログ
+  left.forEach(name => {
+    messagesRef.push({ text: `${name} が退室しました。`, name: "システム", time: Date.now() });
+  });
+  // 入室ログ（あれば）
+  joined.forEach(name => {
+    messagesRef.push({ text: `${name} が入室しました。`, name: "システム", time: Date.now() });
+  });
+
+  // 人数チェック
+  stateRef.once("value").then(stSnap => {
+    const st = stSnap.val() || {};
+    // 少ないので一時停止する（まだ paused でなければ）
+    if (count < REQUIRED_PLAYERS) {
+      if (!st.phasePaused) {
+        // compute remaining seconds if we have phaseEndAt
+        const endAt = st.phaseEndAt || null;
+        let remaining = null;
+        if (endAt) remaining = Math.max(0, Math.floor((endAt - Date.now()) / 1000));
+        stateRef.update({ phasePaused: true, pausedRemaining: remaining, phaseEndAt: null });
+        messagesRef.push({ text: `人数が ${count} 人になったためゲームを一時停止します。`, name: "システム", time: Date.now() });
+      }
+    } else {
+      // 人数が揃っている -> 再開処理（GMのみ行う）
+      if (st.phasePaused) {
+        if (isGm) {
+          // 再開：もし pausedRemaining があればそれを使う、無ければ既定長を使う
+          const pausedRem = st.pausedRemaining;
+          const phaseName = st.phase || "day";
+          const resumeDuration = (pausedRem != null) ? pausedRem : (PHASE_LENGTHS[phaseName] || 60);
+          const newEndAt = Date.now() + resumeDuration * 1000;
+          stateRef.update({ phasePaused: false, phaseEndAt: newEndAt, pausedRemaining: null });
+          messagesRef.push({ text: `人数が揃いました。ゲームを再開します。`, name: "システム", time: Date.now() });
+        } else {
+          // 非GMは再開待ち（GM が操作するまで何もしない）
         }
       }
-      updateTimer();
-      phaseTimer = setInterval(updateTimer, 500);
-    } else {
-      if (phaseTimerEl) phaseTimerEl.textContent = "残り 0s";
-      nextPhase();
-    }
-
-    // 行動状況リセット
-    actionsRef.set({});
-  }
-
-  function nextPhase() {
-    currentPhaseIndex = (currentPhaseIndex + 1) % PHASE_ORDER.length;
-    if (currentPhaseIndex === 0) currentDay++;
-    startPhase(PHASE_ORDER[currentPhaseIndex], currentDay);
-  }
-
-  startPhase(PHASE_ORDER[currentPhaseIndex], currentDay);
-
-  // --- 行動完了ボタン ---
-  actionBtn.addEventListener("click", () => {
-    actionsRef.child(playerName).set(true);
-    actionBtn.style.display = "none";
-    actionStatus.style.display = "block";
-  });
-
-  // --- 全員の行動完了を監視 ---
-  actionsRef.on("value", async (snap) => {
-    const actions = snap.val() || {};
-    const playersSnap = await db.ref(`rooms/${roomId}/players`).once("value");
-    const players = playersSnap.val() || {};
-    const total = Object.keys(players).length;
-    const done  = Object.keys(actions).length;
-    if (total > 0 && done >= total) {
-      nextPhase();
     }
   });
 
-}); // DOMContentLoaded end
+});
+  // DOMContentLoaded end
