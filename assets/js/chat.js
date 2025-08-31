@@ -152,3 +152,68 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 }); // DOMContentLoaded end
+
+// ==========================
+// フェーズ管理（ローカルのみ）
+// ==========================
+const PHASE_ORDER = ["morning", "day", "evening", "night"];
+const PHASE_LENGTHS = {
+  morning: 0,       // 0秒
+  day: 6 * 60,      // 6分
+  evening: 2 * 60,  // 2分
+  night: 2 * 60     // 2分
+};
+
+let currentPhaseIndex = 0;
+let currentDay = 1;
+let phaseTimer = null;
+
+// 表示用要素
+const phaseInfoEl = document.getElementById("phaseInfo");
+const phaseTimerEl = document.getElementById("phaseTimer");
+
+function startPhase(phase, day) {
+  const length = PHASE_LENGTHS[phase];
+
+  // フェーズ名を日本語化
+  const phaseLabel = {
+    morning: "朝",
+    day: "昼",
+    evening: "夕方",
+    night: "夜"
+  }[phase];
+
+  // 表示更新
+  if (phaseInfoEl) phaseInfoEl.textContent = `Day ${day} — ${phaseLabel}`;
+  
+  // 残り時間表示（morningは即次へ進む）
+  if (phaseTimer) { clearInterval(phaseTimer); phaseTimer = null; }
+  if (length > 0) {
+    let endTime = Date.now() + length * 1000;
+    function updateTimer() {
+      const left = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      if (phaseTimerEl) phaseTimerEl.textContent = `残り ${left}s`;
+      if (left <= 0) {
+        clearInterval(phaseTimer);
+        phaseTimer = null;
+        nextPhase();
+      }
+    }
+    updateTimer();
+    phaseTimer = setInterval(updateTimer, 500);
+  } else {
+    // morningは即スキップ
+    if (phaseTimerEl) phaseTimerEl.textContent = `残り 0s`;
+    nextPhase();
+  }
+}
+
+function nextPhase() {
+  currentPhaseIndex = (currentPhaseIndex + 1) % PHASE_ORDER.length;
+  if (currentPhaseIndex === 0) currentDay++; // 1周したら日数+1
+  const phase = PHASE_ORDER[currentPhaseIndex];
+  startPhase(phase, currentDay);
+}
+
+// 最初のフェーズ開始
+startPhase(PHASE_ORDER[currentPhaseIndex], currentDay);
