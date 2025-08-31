@@ -1,4 +1,15 @@
-  // ランダムなルームID生成
+document.addEventListener("DOMContentLoaded", () => {
+  const db = firebase.database();
+  const roomId = "defaultRoom"; // 実際は動的に取得するならURLから取ってもOK
+
+  const nameInput = document.getElementById("playerNameInput");
+  const joinBtn = document.getElementById("joinBtn");
+  const joinAsGmBtn = document.getElementById("joinAsGmBtn");
+  const playerListEl = document.getElementById("playerList");
+
+
+
+// ランダムなルームID生成
   function generateRoomId(length = 8) {
     const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
     let id = "";
