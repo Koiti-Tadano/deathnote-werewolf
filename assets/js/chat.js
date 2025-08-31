@@ -21,7 +21,7 @@ if (playerInfoEl) playerInfoEl.textContent = "あなた: " + playerName;
 
 
 // メッセージ参照
-const messagesRef = db.ref("rooms/" + roomId + "/messages");
+//const messagesRef = db.ref("rooms/" + roomId + "/messages");
 
 // 入力欄とボタンを取得
 //const msgInput = document.getElementById("msgInput");
