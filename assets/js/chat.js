@@ -1,10 +1,9 @@
 const db = firebase.database();
 
 // URLパラメータ取得
-const params   = new URLSearchParams(window.location.search);
-const roomId   = params.get("room") || "defaultRoom";
-const urlName  = params.get("name");
-
+const params = new URLSearchParams(window.location.search);
+const roomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
+const playerName = params.get("name") || localStorage.getItem("playerName") || "名無し";
 // プレイヤー名の決定（URL > localStorage > 既定値）
 let playerName = urlName || localStorage.getItem("playerName") || "名無し";
 // URLで来たら上書き保存（次回以降も反映されるように）
