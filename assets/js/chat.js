@@ -156,9 +156,18 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================
 // フェーズ管理（ローカルのみ）
 // ==========================
+// プレイヤーIDを作成（名前をキーにして簡易化）
+const myPlayerId = playerName || ("player_" + Math.random().toString(36).substr(2, 5));
+
+// Firebaseのルート参照
+const stateRef = firebase.database().ref(`rooms/${roomId}/state`);
+const actionsRef = firebase.database().ref(`rooms/${roomId}/actions`);
 const PHASE_ORDER = ["morning", "day", "evening", "night"];
 const PHASE_LENGTHS = {
-  morning: 0,       // 0秒
+
+// フェーズ時間設定
+const PHASE_LENGTHS = {
+  morning: 60,      // 1分
   day: 6 * 60,      // 6分
   evening: 2 * 60,  // 2分
   night: 2 * 60     // 2分
@@ -185,8 +194,32 @@ function startPhase(phase, day) {
 
   // 表示更新
   if (phaseInfoEl) phaseInfoEl.textContent = `Day ${day} — ${phaseLabel}`;
-  
-  // 残り時間表示（morningは即次へ進む）
+
+  // --- システムメッセージ ---
+  if (phase === "morning") {
+    messagesRef.push({
+      text: `--- ${day}日目が始まりました ---`,
+      name: "システム",
+      time: Date.now()
+    });
+    if (day === 1) {
+      messagesRef.push({
+        text: "初日は簡単なルール説明：ここで全員が自己紹介などをしてください。",
+        name: "システム",
+        time: Date.now()
+      });
+    }
+  }
+
+  // --- 行動完了ボタン制御 ---
+  const actionBtn = document.getElementById("actionDoneBtn");
+  const actionStatus = document.getElementById("actionStatus");
+  actionBtn.style.display = "inline-block";
+  actionStatus.style.display = "none";
+  actionBtn.disabled = false;
+  actionBtn.textContent = (phase === "morning") ? "◯日目を始める" : "行動完了";
+
+  // --- タイマー処理 ---
   if (phaseTimer) { clearInterval(phaseTimer); phaseTimer = null; }
   if (length > 0) {
     let endTime = Date.now() + length * 1000;
@@ -202,10 +235,12 @@ function startPhase(phase, day) {
     updateTimer();
     phaseTimer = setInterval(updateTimer, 500);
   } else {
-    // morningは即スキップ
     if (phaseTimerEl) phaseTimerEl.textContent = `残り 0s`;
     nextPhase();
   }
+
+  // フェーズ開始時に「行動完了状況」をリセット
+  actionsRef.set({});
 }
 
 function nextPhase() {
@@ -217,3 +252,27 @@ function nextPhase() {
 
 // 最初のフェーズ開始
 startPhase(PHASE_ORDER[currentPhaseIndex], currentDay);
+
+const actionBtn = document.getElementById("actionDoneBtn");
+const actionStatus = document.getElementById("actionStatus");
+
+// ボタン押したら "actions/{playerId}" に true を記録
+actionBtn.addEventListener("click", () => {
+  actionsRef.child(myPlayerId).set(true);
+  actionBtn.style.display = "none";
+  actionStatus.style.display = "block";
+});
+
+// 全員押したかどうか監視
+actionsRef.on("value", async (snap) => {
+  const actions = snap.val() || {};
+  const playersSnap = await firebase.database().ref(`rooms/${roomId}/players`).once("value");
+  const players = playersSnap.val() || {};
+  const totalPlayers = Object.keys(players).length;
+  const donePlayers = Object.keys(actions).length;
+
+  if (totalPlayers > 0 && donePlayers >= totalPlayers) {
+    // 全員が行動完了 → 次フェーズへ
+    nextPhase();
+  }
+});
