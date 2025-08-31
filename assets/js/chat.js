@@ -214,18 +214,16 @@ document.addEventListener("DOMContentLoaded", () => {
       menu.appendChild(btnVote);
     }
 
-    const btnDetective = document.createElement("button");
-    btnDetective.textContent = "探偵";
-    btnDetective.onclick = () => {
-      const gmRoomId = `${roomId}-gm-${playerName}`;
-      window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
-      menu.remove();
-    };
-    menu.appendChild(btnDetective);
-
-    anchorEl.parentElement.appendChild(menu);
-  }
-
+if (role === "detective" && currentPhase === "night") {
+  const btnDetective = document.createElement("button");
+  btnDetective.textContent = "探偵";
+  btnDetective.onclick = () => {
+    const gmRoomId = `${roomId}-gm-${playerName}`;
+    window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+    menu.remove();
+  };
+  menu.appendChild(btnDetective);
+}
   // ======================================================
   // Firebase ベースのフェーズ管理
   // ======================================================
