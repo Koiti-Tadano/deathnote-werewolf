@@ -91,6 +91,36 @@ document.addEventListener("DOMContentLoaded", () => {
     messagesList.scrollTop = messagesList.scrollHeight;
   });
 
+const isGm = localStorage.getItem("isGm") === "true";
+
+// GM専用UIを表示
+if (isGm) {
+  document.getElementById("gmControls").style.display = "block";
+
+  // ゲーム開始ボタン
+  document.getElementById("startGameBtn").addEventListener("click", async () => {
+    // プレイヤー数チェック
+    const snap = await db.ref(`rooms/${roomId}/players`).once("value");
+    const players = snap.val() || {};
+    const playerCount = Object.keys(players).length;
+
+    if (playerCount + 1 < 8) { // +1 はGM
+      alert("8人揃っていません");
+      return;
+    }
+
+    // 役職を割り当て
+    assignRoles(roomId);
+
+    // フェーズを morning に初期化
+    db.ref(`rooms/${roomId}/state`).set({
+      currentPhase: "morning",
+      currentDay: 1,
+      phaseStart: Date.now()
+    });
+  });
+}
+  
   // --- アクションメニュー ---
   function openActionMenu(anchorEl, msg) {
     const prev = document.querySelector(".action-menu");
