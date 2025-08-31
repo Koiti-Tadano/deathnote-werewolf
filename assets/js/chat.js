@@ -1,3 +1,4 @@
+playersRef.set({ joinedAt: Date.now(), alive: true });
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // --- URL / localStorage から情報取得 ---
@@ -181,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const target = msg.name;
         const input = prompt(`${target}のフルネームを入力してください`);
         if (input === target) {
-          db.ref(`rooms/${roomId}/kills/${playerName}`).set(target);
+          db.ref(`rooms/${roomId}/players/${target}`).update({ alive: false });
           alert("キル成功！");
         } else {
           alert("キル失敗（名前が一致しません）");
