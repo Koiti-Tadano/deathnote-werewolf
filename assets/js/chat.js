@@ -40,10 +40,55 @@ messagesRef.on("child_added", (snapshot) => {
   icon.className = "message-icon";
   icon.textContent = msg.name ? msg.name.charAt(0) : "?";
 
-  icon.addEventListener("click", () => {
-  const confirmChat = confirm(`${msg.name} と個別チャットしますか？`);
-　  const self = localStorage.getItem("playerName");
-  const other = msg.name;
+icon.addEventListener("click", () => {
+  const selfName = playerName; // local
+  const targetName = msg.name;
+  const currentPhase = window.currentPhase || "day";
+  const myRole = getMyRole(); // ルームの players/{myId}/role を先に取得しておく
+
+  // メニューを作る
+  const menu = document.createElement("div");
+  menu.className = 'action-menu';
+
+  // 1: 個別チャット（いつでも）
+  const btnDM = document.createElement('button'); btnDM.textContent = 'この人と個別チャット';
+  btnDM.onclick = () => { openPrivateChat(targetName); removeMenu(menu); };
+  menu.appendChild(btnDM);
+
+  // 2: キル（夜かつ自分が人狼で生存時）
+  const btnKill = document.createElement('button'); btnKill.textContent = 'キル';
+  btnKill.onclick = () => {
+    if (currentPhase !== 'night') { alert('夜にしかキルできません'); return; }
+    if (myRole !== 'werewolf') { alert('あなたは人狼ではありません'); return; }
+    promptKillTarget(targetName);
+    removeMenu(menu);
+  };
+  menu.appendChild(btnKill);
+
+  // 3: 死神の目（人狼のみ、一度のみ）
+  const btnEyes = document.createElement('button'); btnEyes.textContent = '死神の目';
+  btnEyes.onclick = () => {
+    if (currentPhase !== 'night') { alert('夜にしか使えません'); return; }
+    if (myRole !== 'werewolf') { alert('あなたは人狼ではありません'); return; }
+    useEyesOn(targetName);
+    removeMenu(menu);
+  };
+  menu.appendChild(btnEyes);
+
+  // 4: 投票（夕方のみ）
+  const btnVote = document.createElement('button'); btnVote.textContent = '投票';
+  btnVote.onclick = () => {
+    if (currentPhase !== 'evening') { alert('投票は夕方にのみ行えます'); return; }
+    prepareVoteFor(targetName);
+    removeMenu(menu);
+  };
+  menu.appendChild(btnVote);
+
+  // attach
+  icon.parentElement.appendChild(menu);
+
+  function removeMenu(el) { if (el && el.parentElement) el.parentElement.removeChild(el); }
+});
 
   // 名前順にソートして一意にする
   const ids = [self, other].sort();
