@@ -25,42 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- プレイヤー参加を記録 ---
   playersRef.set({ joinedAt: Date.now(), alive: true });
   playersRef.onDisconnect().remove();
-// --- 自分の状態監視（alive判定） ---
-playersRef.on("value", (snap) => {
-  const me = snap.val();
-  if (me && me.alive === false) {
-    // 発言禁止
-    if (sendBtn) sendBtn.disabled = true;
-    if (actionBtn) actionBtn.disabled = true;
-
-    // 観戦モード表示
-    const spectateEl = document.getElementById("spectateArea") || document.createElement("div");
-    spectateEl.id = "spectateArea";
-    spectateEl.innerHTML = "<h3>会話を覗き見る</h3>";
-
-    // 全てのルームを一覧表示
-    db.ref(`rooms/${roomId}`).once("value").then((roomSnap) => {
-      const roomData = roomSnap.val() || {};
-      const links = [];
-
-      // 全体チャット
-      links.push(roomId);
-
-      // 個別チャットなど（roomIdで始まる全ルームを抽出）
-      Object.keys(roomData).forEach(key => {
-        if (key.startsWith(roomId + "-")) {
-          links.push(key);
-        }
-      });
-
-      spectateEl.innerHTML += links.map(id =>
-        `<div><a href="chat.html?room=${id}&name=${encodeURIComponent(playerName)}" target="_blank">${id}</a></div>`
-      ).join("");
-
-      document.body.appendChild(spectateEl);
-    });
-  }
-});
   // --- DOM 要素 ---
   const msgInput     = document.getElementById("msgInput");
   const sendBtn      = document.getElementById("sendBtn");
