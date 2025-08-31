@@ -111,6 +111,21 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
 　  window.location.href = `chat.html?room=${roomId}&name=${encodeURIComponent(playerName)}`;
 });
 
+// GMとして参加
+document.getElementById("joinAsGmBtn").addEventListener("click", async () => {
+  const gmSnap = await db.ref(`rooms/${roomId}/gm`).once("value");
+  if (gmSnap.exists()) {
+    alert("すでにGMが参加しています");
+    return;
+  }
+
+  // GM登録
+  await db.ref(`rooms/${roomId}/gm`).set({ id: "GM" });
+  localStorage.setItem("playerName", "GM");
+  localStorage.setItem("isGm", "true");
+  window.location.href = `chat.html?room=${roomId}&name=GM`;
+});
+  
 // コピー機能
 document.getElementById("copyRoomIdBtn").addEventListener("click", () => {
   const roomId = document.getElementById("roomIdDisplay").textContent;
