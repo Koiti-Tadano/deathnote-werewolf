@@ -3,10 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>プレイ | デスノート人狼（非公式）</title>
+  <title>部屋チャット | デスノート人狼（非公式）</title>
   <link rel="stylesheet" href="assets/css/style.css">
-  <script defer src="assets/config.js"></script>
-  <script defer src="assets/script.js"></script>
+
+  <!-- Firebase SDK は chat.js の前に必要 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- firebase-config.js をここで読み込み（初期化済みであること） -->
+  <script src="assets/js/firebase-config.js"></script>
+  <!-- chat.js は body の最後で読み込む -->
 </head>
 <body>
   <div class="nav">
@@ -16,68 +22,46 @@
         <div class="title">デスノート人狼（非公式）</div>
       </div>
       <details class="nav-accordion">
-       <summary>メニュー</summary> 
-  <div class="menu">
-        <a class="button" href="index.html"><strong>ゲームを終了</strong></a>
-        <button class="button" id="openRules"><strong>ルールを参照</strong></button>
-  </div>
+        <summary>メニュー</summary>
+        <div class="menu">
+          <a class="button" href="index.html"><strong>ゲームを終了</strong></a>
+          <button class="button" id="openRules"><strong>ルールを参照</strong></button>
+        </div>
       </details>
     </div>
   </div>
-    
-<script>
-    // URLからroomパラメータを取得
-const urlParams = new URLSearchParams(window.location.search);
-const roomId = urlParams.get("room") || "defaultRoom"; // パラメータがなければ全体ルーム
-  <meta charset="utf-8">
-document.getElementById("openRules").addEventListener("click", async () => {
-  try {
-    const res = await fetch("rules.html");      // rules.htmlを取得
-    const text = await res.text();              // 中身を文字列で読む
-    document.getElementById("rulesContent").innerHTML = text; // モーダルに差し込む
-    document.getElementById("rulesModal").style.display = "block"; // モーダル表示
-  } catch (e) {
-    document.getElementById("rulesContent").innerHTML = "<p>ルールを読み込めませんでした。</p>";
-  }
-});
 
-document.getElementById("closeRules").addEventListener("click", () => {
-  document.getElementById("rulesModal").style.display = "none";
-});
-</script>
-  
-<h1>部屋チャット</h1>
-<div id="roomInfo"></div>  <!-- ルームID表示用 -->
+  <main class="container">
+    <h1>部屋チャット</h1>
 
-<div id="chatBox">
-  <ul id="messages"></ul>
-</div>
-<input id="msgInput" placeholder="メッセージを入力">
-<button id="sendBtn">送信</button>
+    <div id="roomInfo" style="margin-bottom:.5rem"></div>
+    <div id="playerInfo" style="margin-bottom:1rem"></div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <div id="chatBox">
+      <ul id="messages"></ul>
+    </div>
 
-  <!-- 自作スクリプト -->
-  <script src="assets/js/firebase-config.js"></script>
-  <script src="assets/js/chat.js"></script>
+    <div class="chat-input">
+      <input id="msgInput" placeholder="メッセージを入力">
+      <button id="sendBtn">送信</button>
+    </div>
 
-<!-- モーダル（非表示のルール画面） -->
-<div id="rulesModal" class="modal">
-  <div class="modal-content">
-    <span class="close-btn" id="closeRules">&times;</span>
-    <h2>ルール</h2>
-    <!-- 注意書き -->
-    <p class="rules-note">※ 簡易版です。見やすいのは <a href="rules.html" target="_blank">ルール画面</a> から。</p>
-    <div id="rulesContent" class="rules-body">
-      <!-- ここに rules.html をJSで読み込んで表示 -->
+    <!-- フェーズ表示（フェーズ管理用） -->
+    <div id="phaseInfo" style="margin-top:.5rem"></div>
+    <div id="phaseTimer" style="margin-bottom:1rem"></div>
+  </main>
+
+  <!-- モーダル（非表示のルール画面） -->
+  <div id="rulesModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close-btn" id="closeRules">&times;</span>
+      <h2>ルール</h2>
+      <p class="rules-note">※ 簡易版です。見やすいのは <a href="rules.html" target="_blank">ルール画面</a> から。</p>
+      <div id="rulesContent" class="rules-body"></div>
     </div>
   </div>
-</div>
 
-
-
-
+  <!-- 自作スクリプト（ここで読み込む） -->
+  <script src="assets/js/chat.js"></script>
 </body>
 </html>
