@@ -24,9 +24,9 @@ if (playerInfoEl) playerInfoEl.textContent = "あなた: " + playerName;
 const messagesRef = db.ref("rooms/" + roomId + "/messages");
 
 // 入力欄とボタンを取得
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
-const messagesList = document.getElementById("messages");
+//const msgInput = document.getElementById("msgInput");
+//const sendBtn = document.getElementById("sendBtn");
+//const messagesList = document.getElementById("messages");
 
 // メッセージ送信
 sendBtn.addEventListener("click", () => {
