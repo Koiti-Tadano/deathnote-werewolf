@@ -153,7 +153,73 @@ async function assignRoles(roomId) {
 
   // --- アクションメニュー（略、あなたのコードそのまま） ---
   function openActionMenu(anchorEl, msg) {
+    const prev = document.querySelector(".action-menu");
+    if (prev) prev.remove();
+
+    const menu = document.createElement("div");
+    menu.className = "action-menu";
     // ...（省略: 個別チャット/キル/死神の目/投票/探偵）
+        // 個別チャット（例）
+    const btnDM = document.createElement("button");
+    btnDM.textContent = "個別チャット";
+    btnDM.onclick = () => {
+      const ids = [playerName, msg.name].sort();
+      const privateRoomId = `${roomId}-dm-${ids[0]}-${ids[1]}`;
+      window.open(`chat.html?room=${privateRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+      menu.remove();
+    };
+    menu.appendChild(btnDM);
+if (role === "wolf" && currentPhase === "night") {
+  const btnKill = document.createElement("button");
+  btnKill.textContent = "キル";
+  btnKill.onclick = () => {
+    const target = msg.name;
+    const input = prompt(`${target}のフルネームを入力してください`);
+    if (input === target) {
+      db.ref(`rooms/${roomId}/kills/${playerName}`).set(target);
+      alert("キル成功！");
+    } else {
+      alert("キル失敗（名前が一致しません）");
+    }
+    menu.remove();
+  };
+  menu.appendChild(btnKill);
+}
+
+if (role === "wolf" && currentPhase === "night" && !usedShinigamiEye) {
+  const btnEye = document.createElement("button");
+  btnEye.textContent = "死神の目";
+  btnEye.onclick = () => {
+    db.ref(`rooms/${roomId}/shinigami/${playerName}`).set(msg.name);
+    alert(`${msg.name} のフルネームは: ${msg.name}`);
+    usedShinigamiEye = true;
+    menu.remove();
+  };
+  menu.appendChild(btnEye);
+}
+
+if (currentPhase === "evening") {
+  const btnVote = document.createElement("button");
+  btnVote.textContent = "投票する";
+  btnVote.onclick = () => {
+    db.ref(`rooms/${roomId}/votes/${playerName}`).set(msg.name);
+    alert(`あなたは ${msg.name} に投票しました`);
+    menu.remove();
+  };
+  menu.appendChild(btnVote);
+}
+
+const btnDetective = document.createElement("button");
+btnDetective.textContent = "探偵";
+btnDetective.onclick = () => {
+  const gmRoomId = `${roomId}-gm-${playerName}`;
+  window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+  menu.remove();
+};
+menu.appendChild(btnDetective);
+    anchorEl.parentElement.appendChild(menu);
+  }
+
   }
 
   // ======================================================
@@ -244,24 +310,24 @@ async function assignRoles(roomId) {
     joined.forEach(name => messagesRef.push({ text: `${name} が入室しました。`, name: "システム", time: Date.now() }));
 
     // 人数不足チェック
-    stateRef.once("value").then(stSnap => {
-      const st = stSnap.val() || {};
-      if (count < REQUIRED_PLAYERS) {
-        if (!st.phasePaused) {
-          const endAt = st.phaseEndAt || null;
-          let remaining = null;
-          if (endAt) remaining = Math.max(0, Math.floor((endAt - Date.now()) / 1000));
-          stateRef.update({ phasePaused: true, pausedRemaining: remaining, phaseEndAt: null });
-          messagesRef.push({ text: `人数が ${count} 人になったため一時停止。`, name: "システム", time: Date.now() });
-        }
-      } else {
-        if (st.phasePaused && isGm) {
-          const rem = st.pausedRemaining;
-          const resume = (rem != null) ? rem : PHASE_LENGTHS[st.phase];
-          const newEndAt = Date.now() + resume * 1000;
-          stateRef.update({ phasePaused: false, phaseEndAt: newEndAt, pausedRemaining: null });
-          messagesRef.push({ text: `人数が揃いました。ゲームを再開します。`, name: "システム", time: Date.now() });
-        }
+//    stateRef.once("value").then(stSnap => {
+//      const st = stSnap.val() || {};
+//      if (count < REQUIRED_PLAYERS) {
+//        if (!st.phasePaused) {
+//          const endAt = st.phaseEndAt || null;
+//          let remaining = null;
+//          if (endAt) remaining = Math.max(0, Math.floor((endAt - Date.now()) / 1000));
+//          stateRef.update({ phasePaused: true, pausedRemaining: remaining, phaseEndAt: null });
+//          messagesRef.push({ text: `人数が ${count} 人になったため一時停止。`, name: "システム", time: Date.now() });
+//        }
+//      } else {
+//        if (st.phasePaused && isGm) {
+//          const rem = st.pausedRemaining;
+//          const resume = (rem != null) ? rem : PHASE_LENGTHS[st.phase];
+//          const newEndAt = Date.now() + resume * 1000;
+//          stateRef.update({ phasePaused: false, phaseEndAt: newEndAt, pausedRemaining: null });
+//          messagesRef.push({ text: `人数が揃いました。ゲームを再開します。`, name: "システム", time: Date.now() });
+//        }
       }
     });
   });
