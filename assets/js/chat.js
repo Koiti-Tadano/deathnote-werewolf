@@ -109,7 +109,54 @@ document.addEventListener("DOMContentLoaded", () => {
       menu.remove();
     };
     menu.appendChild(btnDM);
+if (role === "wolf" && currentPhase === "night") {
+  const btnKill = document.createElement("button");
+  btnKill.textContent = "キル";
+  btnKill.onclick = () => {
+    const target = msg.name;
+    const input = prompt(`${target}のフルネームを入力してください`);
+    if (input === target) {
+      db.ref(`rooms/${roomId}/kills/${playerName}`).set(target);
+      alert("キル成功！");
+    } else {
+      alert("キル失敗（名前が一致しません）");
+    }
+    menu.remove();
+  };
+  menu.appendChild(btnKill);
+}
 
+if (role === "wolf" && currentPhase === "night" && !usedShinigamiEye) {
+  const btnEye = document.createElement("button");
+  btnEye.textContent = "死神の目";
+  btnEye.onclick = () => {
+    db.ref(`rooms/${roomId}/shinigami/${playerName}`).set(msg.name);
+    alert(`${msg.name} のフルネームは: ${msg.name}`);
+    usedShinigamiEye = true;
+    menu.remove();
+  };
+  menu.appendChild(btnEye);
+}
+
+if (currentPhase === "evening") {
+  const btnVote = document.createElement("button");
+  btnVote.textContent = "投票する";
+  btnVote.onclick = () => {
+    db.ref(`rooms/${roomId}/votes/${playerName}`).set(msg.name);
+    alert(`あなたは ${msg.name} に投票しました`);
+    menu.remove();
+  };
+  menu.appendChild(btnVote);
+}
+
+const btnDetective = document.createElement("button");
+btnDetective.textContent = "探偵";
+btnDetective.onclick = () => {
+  const gmRoomId = `${roomId}-gm-${playerName}`;
+  window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+  menu.remove();
+};
+menu.appendChild(btnDetective);
     anchorEl.parentElement.appendChild(menu);
   }
 
