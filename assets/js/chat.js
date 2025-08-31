@@ -1,4 +1,3 @@
-getElementById
 const msgInput = document.getElementById("msgInput");
 const sendBtn  = document.getElementById("sendBtn");
 const messagesList = document.getElementById("messages");
