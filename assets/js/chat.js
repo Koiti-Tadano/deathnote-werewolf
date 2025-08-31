@@ -1,84 +1,86 @@
 // assets/js/chat.js
-// 安全な初期化 — DOM が準備できてから実行
-document.addEventListener('DOMContentLoaded', () => {
-
+document.addEventListener("DOMContentLoaded", () => {
   // --- URL / localStorage から情報取得 ---
   const params = new URLSearchParams(window.location.search);
-  const roomId = params.get('room') || localStorage.getItem('roomId') || 'defaultRoom';
-  const playerName = params.get('name') || localStorage.getItem('playerName') || '名無し';
+  const roomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
+  const playerName = params.get("name") || localStorage.getItem("playerName") || "名無し";
 
-  // 保存（次回のため）
-  localStorage.setItem('roomId', roomId);
-  localStorage.setItem('playerName', playerName);
+  localStorage.setItem("roomId", roomId);
+  localStorage.setItem("playerName", playerName);
 
-  // --- Firebase DB 初期参照 ---
-  if (typeof firebase === 'undefined') {
-    console.error('firebase が定義されていません。firebase-config.js を読み込んで初期化してください。');
+  // --- Firebase 初期化確認 ---
+  if (typeof firebase === "undefined") {
+    alert("Firebase が読み込まれていません！");
     return;
   }
   const db = firebase.database();
 
+  // --- DB 参照 ---
+  const messagesRef = db.ref(`rooms/${roomId}/messages`);
+  const stateRef    = db.ref(`rooms/${roomId}/state`);
+  const actionsRef  = db.ref(`rooms/${roomId}/actions`);
+  const playersRef  = db.ref(`rooms/${roomId}/players/${playerName}`);
+
+  // --- プレイヤー参加を記録 ---
+  playersRef.set({ joinedAt: Date.now() });
+  playersRef.onDisconnect().remove();
+
   // --- DOM 要素 ---
-  const roomInfoEl = document.getElementById('roomInfo');
-  const playerInfoEl = document.getElementById('playerInfo');
-  const msgInput = document.getElementById('msgInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const messagesList = document.getElementById('messages');
+  const msgInput     = document.getElementById("msgInput");
+  const sendBtn      = document.getElementById("sendBtn");
+  const messagesList = document.getElementById("messages");
+  const phaseInfoEl  = document.getElementById("phaseInfo");
+  const phaseTimerEl = document.getElementById("phaseTimer");
+  const actionBtn    = document.getElementById("actionDoneBtn");
+  const actionStatus = document.getElementById("actionStatus");
+  const roomInfoEl   = document.getElementById("roomInfo");
+  const playerInfoEl = document.getElementById("playerInfo");
 
-  // 表示
-  if (roomInfoEl) roomInfoEl.textContent = 'ルームID: ' + roomId;
-  if (playerInfoEl) playerInfoEl.textContent = 'あなた: ' + playerName;
+  if (roomInfoEl) roomInfoEl.textContent = `ルームID: ${roomId}`;
+  if (playerInfoEl) playerInfoEl.textContent = `あなた: ${playerName}`;
 
-  // --- メッセージ参照 ---
-  const messagesRef = db.ref('rooms/' + roomId + '/messages');
-
-  // --- 送信処理 ---
-  sendBtn.addEventListener('click', () => {
-    const text = msgInput.value;
-    if (!text || text.trim() === '') return;
-    // push メッセージ
+  // --- メッセージ送信 ---
+  sendBtn.addEventListener("click", () => {
+    const text = msgInput.value.trim();
+    if (!text) return;
     messagesRef.push({
-      text: text.trim(),
+      text,
       name: playerName,
       time: Date.now()
     }).then(() => {
-      msgInput.value = '';
+      msgInput.value = "";
     }).catch(err => {
-      console.error('メッセージ送信エラー:', err);
-      alert('メッセージ送信に失敗しました。');
+      console.error("送信エラー:", err);
     });
   });
 
-  // Enter キーで送信（オプション）
-  msgInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+  msgInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
       e.preventDefault();
       sendBtn.click();
     }
   });
 
-  // --- 受信表示 ---
-  messagesRef.on('child_added', (snapshot) => {
-    const msg = snapshot.val();
-    const li = document.createElement('li');
-    li.className = 'message-item';
+  // --- メッセージ受信 ---
+  messagesRef.on("child_added", (snap) => {
+    const msg = snap.val();
+    const li = document.createElement("li");
+    li.className = "message-item";
 
-    // アイコン（頭文字）
-    const icon = document.createElement('div');
-    icon.className = 'message-icon';
-    icon.textContent = msg.name ? msg.name.charAt(0) : '?';
+    const icon = document.createElement("div");
+    icon.className = "message-icon";
+    icon.textContent = msg.name ? msg.name.charAt(0) : "?";
 
-    // アイコンを押した時の簡易メニュー（あとで拡張）
-    icon.addEventListener('click', () => {
+    icon.addEventListener("click", () => {
       openActionMenu(icon, msg);
     });
 
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'message-name';
-    nameSpan.textContent = msg.name || '名無し';
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "message-name";
+    nameSpan.textContent = msg.name || "名無し";
 
-    const textSpan = document.createElement('span');
-    textSpan.className = 'message-text';
+    const textSpan = document.createElement("span");
+    textSpan.className = "message-text";
     textSpan.textContent = msg.text;
 
     li.appendChild(icon);
@@ -86,195 +88,112 @@ document.addEventListener('DOMContentLoaded', () => {
     li.appendChild(textSpan);
     messagesList.appendChild(li);
 
-    // スクロール最下部へ
     messagesList.scrollTop = messagesList.scrollHeight;
   });
 
-  // ------------ アクションメニュー（簡易） ------------
+  // --- アクションメニュー ---
   function openActionMenu(anchorEl, msg) {
-    // 既にメニューがあれば消す
-    const prev = document.querySelector('.action-menu');
+    const prev = document.querySelector(".action-menu");
     if (prev) prev.remove();
 
-    const menu = document.createElement('div');
-    menu.className = 'action-menu';
+    const menu = document.createElement("div");
+    menu.className = "action-menu";
 
-    // 個別チャット
-    const btnDM = document.createElement('button');
-    btnDM.textContent = '個別チャット';
+    // 個別チャット（例）
+    const btnDM = document.createElement("button");
+    btnDM.textContent = "個別チャット";
     btnDM.onclick = () => {
-      const self = playerName;
-      const other = msg.name || '名無し';
-      // 名前順にして一意化
-      const ids = [self, other].sort();
-      const privateRoomId = roomId + '-' + encodeURIComponent(ids[0]) + '-' + encodeURIComponent(ids[1]);
-      window.open('chat.html?room=' + privateRoomId + '&name=' + encodeURIComponent(self), '_blank');
+      const ids = [playerName, msg.name].sort();
+      const privateRoomId = `${roomId}-dm-${ids[0]}-${ids[1]}`;
+      window.open(`chat.html?room=${privateRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
       menu.remove();
     };
     menu.appendChild(btnDM);
 
-    // （ここにキル／投票ボタンなどを後で追加）
     anchorEl.parentElement.appendChild(menu);
   }
 
-  // ------------ フェーズ管理の placeholder (UI用) ------------
-  // フェーズ表示要素（chat.html に #phaseInfo、#phaseTimer を用意済み）
-  const phaseInfoEl = document.getElementById('phaseInfo');
-  const phaseTimerEl = document.getElementById('phaseTimer');
-  window.currentPhase = 'day'; // 初期
+  // --- フェーズ管理 ---
+  const PHASE_ORDER = ["morning", "day", "evening", "night"];
+  const PHASE_LENGTHS = {
+    morning: 60,       // 1分
+    day: 6 * 60,       // 6分
+    evening: 2 * 60,   // 2分
+    night: 2 * 60      // 2分
+  };
 
-  function updateUIForPhase(phase) {
-    window.currentPhase = phase;
-    if (phaseInfoEl) phaseInfoEl.textContent = '現在: ' + phase;
-  }
-  // ここでは stateRef の監視などは後から追加します（フェーズ管理で実装）
+  let currentPhaseIndex = 0;
+  let currentDay = 1;
+  let phaseTimer = null;
 
-  // ------------ モーダル（ルール）処理 ------------
-  const modal = document.getElementById('rulesModal');
-  const openBtn = document.getElementById('openRules');
-  const closeBtn = document.getElementById('closeRules');
-  if (openBtn && modal) {
-    openBtn.addEventListener('click', async () => {
-      try {
-        const res = await fetch('rules.html');
-        const text = await res.text();
-        document.getElementById('rulesContent').innerHTML = text;
-        modal.style.display = 'block';
-      } catch (e) {
-        document.getElementById('rulesContent').innerHTML = '<p>ルールを読み込めませんでした。</p>';
-        modal.style.display = 'block';
+  function startPhase(phase, day) {
+    const length = PHASE_LENGTHS[phase];
+    const phaseLabel = { morning:"朝", day:"昼", evening:"夕方", night:"夜" }[phase];
+
+    if (phaseInfoEl) phaseInfoEl.textContent = `Day ${day} — ${phaseLabel}`;
+
+    // システムメッセージ
+    if (phase === "morning") {
+      messagesRef.push({ text:`--- ${day}日目が始まりました ---`, name:"システム", time:Date.now() });
+      if (day === 1) {
+        messagesRef.push({ text:"初日はルール説明＆自己紹介をしてください。", name:"システム", time:Date.now() });
       }
-    });
+    }
+
+    // 行動完了ボタンを表示
+    actionBtn.style.display = "inline-block";
+    actionStatus.style.display = "none";
+    actionBtn.disabled = false;
+    actionBtn.textContent = (phase === "morning") ? "◯日目を始める" : "行動完了";
+
+    // タイマー
+    if (phaseTimer) clearInterval(phaseTimer);
+    if (length > 0) {
+      let endTime = Date.now() + length * 1000;
+      function updateTimer() {
+        const left = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+        if (phaseTimerEl) phaseTimerEl.textContent = `残り ${left}s`;
+        if (left <= 0) {
+          clearInterval(phaseTimer);
+          nextPhase();
+        }
+      }
+      updateTimer();
+      phaseTimer = setInterval(updateTimer, 500);
+    } else {
+      if (phaseTimerEl) phaseTimerEl.textContent = "残り 0s";
+      nextPhase();
+    }
+
+    // 行動状況リセット
+    actionsRef.set({});
   }
-  if (closeBtn && modal) {
-    closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
-    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+  function nextPhase() {
+    currentPhaseIndex = (currentPhaseIndex + 1) % PHASE_ORDER.length;
+    if (currentPhaseIndex === 0) currentDay++;
+    startPhase(PHASE_ORDER[currentPhaseIndex], currentDay);
   }
+
+  startPhase(PHASE_ORDER[currentPhaseIndex], currentDay);
+
+  // --- 行動完了ボタン ---
+  actionBtn.addEventListener("click", () => {
+    actionsRef.child(playerName).set(true);
+    actionBtn.style.display = "none";
+    actionStatus.style.display = "block";
+  });
+
+  // --- 全員の行動完了を監視 ---
+  actionsRef.on("value", async (snap) => {
+    const actions = snap.val() || {};
+    const playersSnap = await db.ref(`rooms/${roomId}/players`).once("value");
+    const players = playersSnap.val() || {};
+    const total = Object.keys(players).length;
+    const done  = Object.keys(actions).length;
+    if (total > 0 && done >= total) {
+      nextPhase();
+    }
+  });
 
 }); // DOMContentLoaded end
-
-// ==========================
-// フェーズ管理（ローカルのみ）
-// ==========================
-// プレイヤーIDを作成（名前をキーにして簡易化）
-const myPlayerId = playerName || ("player_" + Math.random().toString(36).substr(2, 5));
-
-// Firebaseのルート参照
-const stateRef = firebase.database().ref(`rooms/${roomId}/state`);
-const actionsRef = firebase.database().ref(`rooms/${roomId}/actions`);
-const PHASE_ORDER = ["morning", "day", "evening", "night"];
-const PHASE_LENGTHS = {
-
-// フェーズ時間設定
-const PHASE_LENGTHS = {
-  morning: 60,      // 1分
-  day: 6 * 60,      // 6分
-  evening: 2 * 60,  // 2分
-  night: 2 * 60     // 2分
-};
-
-let currentPhaseIndex = 0;
-let currentDay = 1;
-let phaseTimer = null;
-
-// 表示用要素
-const phaseInfoEl = document.getElementById("phaseInfo");
-const phaseTimerEl = document.getElementById("phaseTimer");
-
-function startPhase(phase, day) {
-  const length = PHASE_LENGTHS[phase];
-
-  // フェーズ名を日本語化
-  const phaseLabel = {
-    morning: "朝",
-    day: "昼",
-    evening: "夕方",
-    night: "夜"
-  }[phase];
-
-  // 表示更新
-  if (phaseInfoEl) phaseInfoEl.textContent = `Day ${day} — ${phaseLabel}`;
-
-  // --- システムメッセージ ---
-  if (phase === "morning") {
-    messagesRef.push({
-      text: `--- ${day}日目が始まりました ---`,
-      name: "システム",
-      time: Date.now()
-    });
-    if (day === 1) {
-      messagesRef.push({
-        text: "初日は簡単なルール説明：ここで全員が自己紹介などをしてください。",
-        name: "システム",
-        time: Date.now()
-      });
-    }
-  }
-
-  // --- 行動完了ボタン制御 ---
-  const actionBtn = document.getElementById("actionDoneBtn");
-  const actionStatus = document.getElementById("actionStatus");
-  actionBtn.style.display = "inline-block";
-  actionStatus.style.display = "none";
-  actionBtn.disabled = false;
-  actionBtn.textContent = (phase === "morning") ? "◯日目を始める" : "行動完了";
-
-  // --- タイマー処理 ---
-  if (phaseTimer) { clearInterval(phaseTimer); phaseTimer = null; }
-  if (length > 0) {
-    let endTime = Date.now() + length * 1000;
-    function updateTimer() {
-      const left = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-      if (phaseTimerEl) phaseTimerEl.textContent = `残り ${left}s`;
-      if (left <= 0) {
-        clearInterval(phaseTimer);
-        phaseTimer = null;
-        nextPhase();
-      }
-    }
-    updateTimer();
-    phaseTimer = setInterval(updateTimer, 500);
-  } else {
-    if (phaseTimerEl) phaseTimerEl.textContent = `残り 0s`;
-    nextPhase();
-  }
-
-  // フェーズ開始時に「行動完了状況」をリセット
-  actionsRef.set({});
-}
-
-function nextPhase() {
-  currentPhaseIndex = (currentPhaseIndex + 1) % PHASE_ORDER.length;
-  if (currentPhaseIndex === 0) currentDay++; // 1周したら日数+1
-  const phase = PHASE_ORDER[currentPhaseIndex];
-  startPhase(phase, currentDay);
-}
-
-// 最初のフェーズ開始
-startPhase(PHASE_ORDER[currentPhaseIndex], currentDay);
-
-const actionBtn = document.getElementById("actionDoneBtn");
-const actionStatus = document.getElementById("actionStatus");
-
-// ボタン押したら "actions/{playerId}" に true を記録
-actionBtn.addEventListener("click", () => {
-  actionsRef.child(myPlayerId).set(true);
-  actionBtn.style.display = "none";
-  actionStatus.style.display = "block";
-});
-
-// 全員押したかどうか監視
-actionsRef.on("value", async (snap) => {
-  const actions = snap.val() || {};
-  const playersSnap = await firebase.database().ref(`rooms/${roomId}/players`).once("value");
-  const players = playersSnap.val() || {};
-  const totalPlayers = Object.keys(players).length;
-  const donePlayers = Object.keys(actions).length;
-
-  if (totalPlayers > 0 && donePlayers >= totalPlayers) {
-    // 全員が行動完了 → 次フェーズへ
-    nextPhase();
-  }
-});
-
-
