@@ -1,5 +1,9 @@
-const db = firebase.database();
+const msgInput = document.getElementById("msgInput");
+const sendBtn  = document.getElementById("sendBtn");
+const messagesList = document.getElementById("messages");
 
+const db = firebase.database();
+const messagesRef = db.ref("rooms/" + roomId + "/messages");
 // URLパラメータ取得
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
