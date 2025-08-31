@@ -1,6 +1,6 @@
 // assets/js/Firebase.config.js
 var firebaseConfig = {
-y: "AIzaSyBtr461rgEf3kfeXCjDUr8de3H1YjDWlNg",
+  apiKey: "AIzaSyBtr461rgEf3kfeXCjDUr8de3H1YjDWlNg",
   authDomain: "deathnote-werewolf.firebaseapp.com",
   databaseURL: "https://deathnote-werewolf-default-rtdb.firebaseio.com",
   projectId: "deathnote-werewolf",
