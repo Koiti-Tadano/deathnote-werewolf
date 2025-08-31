@@ -110,7 +110,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 役職を割り当て
       assignRoles(roomId);
+async function assignRoles(roomId) {
+  const roles = [
+    "wolf",       // 人狼1
+    "madman",     // 狂人1
+    "detective",  // 探偵1
+    "villager", "villager", "villager", "villager" // 村人4
+  ];
 
+  // プレイヤーを取得
+  const snap = await firebase.database().ref(`rooms/${roomId}/players`).once("value");
+  const players = snap.val() || {};
+  const playerNames = Object.keys(players);
+
+  if (playerNames.length !== roles.length) {
+    alert(`役職の数(${roles.length})とプレイヤー数(${playerNames.length})が一致しません`);
+    return;
+  }
+
+  // シャッフル（Fisher-Yates）
+  for (let i = roles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [roles[i], roles[j]] = [roles[j], roles[i]];
+  }
+
+  // DB に割り当て
+  playerNames.forEach((name, idx) => {
+    firebase.database().ref(`rooms/${roomId}/players/${name}/role`).set(roles[idx]);
+  });
+
+  // システムログ
+  firebase.database().ref(`rooms/${roomId}/messages`).push({
+    text: "役職が割り当てられました。",
+    name: "システム",
+    time: Date.now()
+  });
+}
       // フェーズを morning に初期化
       startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
     });
