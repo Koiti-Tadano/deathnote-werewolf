@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = firebase.database();
 
   // --- DB 参照 ---
-  const messagesRef = db.ref(`rooms/${roomId}/messages`);
-  const stateRef    = db.ref(`rooms/${roomId}/state`);
-  const actionsRef  = db.ref(`rooms/${roomId}/actions`);
-  const playersRef  = db.ref(`rooms/${roomId}/players/${playerName}`);
+  const messagesRef    = db.ref(`rooms/${roomId}/messages`);
+  const stateRef       = db.ref(`rooms/${roomId}/state`);
+  const actionsRef     = db.ref(`rooms/${roomId}/actions`);
+  const playersRef     = db.ref(`rooms/${roomId}/players/${playerName}`);
   const playersListRef = db.ref(`rooms/${roomId}/players`);
 
   // --- プレイヤー参加を記録 ---
@@ -99,67 +99,71 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("gmControls").style.display = "block";
 
     document.getElementById("startGameBtn").addEventListener("click", async () => {
-      const snap = await playersListRef.once("value");
-      const players = snap.val() || {};
-      const playerCount = Object.keys(players).length;
+      // const snap = await playersListRef.once("value");
+      // const players = snap.val() || {};
+      // const playerCount = Object.keys(players).length;
 
-      if (playerCount < 8) {
-        alert("8人揃っていません");
-        return;
-      }
+      // if (playerCount < 8) {
+      //   alert("8人揃っていません");
+      //   return;
+      // }
 
       // 役職を割り当て
-      assignRoles(roomId);
-async function assignRoles(roomId) {
-  const roles = [
-    "wolf",       // 人狼1
-    "madman",     // 狂人1
-    "detective",  // 探偵1
-    "villager", "villager", "villager", "villager" // 村人4
-  ];
+      await assignRoles(roomId);
 
-  // プレイヤーを取得
-  const snap = await firebase.database().ref(`rooms/${roomId}/players`).once("value");
-  const players = snap.val() || {};
-  const playerNames = Object.keys(players);
-
-  if (playerNames.length !== roles.length) {
-    alert(`役職の数(${roles.length})とプレイヤー数(${playerNames.length})が一致しません`);
-    return;
-  }
-
-  // シャッフル（Fisher-Yates）
-  for (let i = roles.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [roles[i], roles[j]] = [roles[j], roles[i]];
-  }
-
-  // DB に割り当て
-  playerNames.forEach((name, idx) => {
-    firebase.database().ref(`rooms/${roomId}/players/${name}/role`).set(roles[idx]);
-  });
-
-  // システムログ
-  firebase.database().ref(`rooms/${roomId}/messages`).push({
-    text: "役職が割り当てられました。",
-    name: "システム",
-    time: Date.now()
-  });
-}
       // フェーズを morning に初期化
       startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
     });
   }
 
-  // --- アクションメニュー（略、あなたのコードそのまま） ---
+  // --- 役職割り当て関数 ---
+  async function assignRoles(roomId) {
+    const roles = [
+      "wolf",       // 人狼1
+      "madman",     // 狂人1
+      "detective",  // 探偵1
+      "villager", "villager", "villager", "villager" // 村人4
+    ];
+
+    const snap = await firebase.database().ref(`rooms/${roomId}/players`).once("value");
+    const players = snap.val() || {};
+    const playerNames = Object.keys(players);
+
+    // if (playerNames.length !== roles.length) {
+    //   alert(`役職の数(${roles.length})とプレイヤー数(${playerNames.length})が一致しません`);
+    //   return;
+    // }
+
+    // シャッフル
+    for (let i = roles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [roles[i], roles[j]] = [roles[j], roles[i]];
+    }
+
+    playerNames.forEach((name, idx) => {
+      firebase.database().ref(`rooms/${roomId}/players/${name}/role`).set(roles[idx] || "villager");
+    });
+
+    firebase.database().ref(`rooms/${roomId}/messages`).push({
+      text: "役職が割り当てられました。",
+      name: "システム",
+      time: Date.now()
+    });
+  }
+
+  // --- アクションメニュー ---
+  let role = null;
+  let currentPhase = "day";
+  let usedShinigamiEye = false;
+
   function openActionMenu(anchorEl, msg) {
     const prev = document.querySelector(".action-menu");
     if (prev) prev.remove();
 
     const menu = document.createElement("div");
     menu.className = "action-menu";
-    // ...（省略: 個別チャット/キル/死神の目/投票/探偵）
-        // 個別チャット（例）
+
+    // 個別チャット
     const btnDM = document.createElement("button");
     btnDM.textContent = "個別チャット";
     btnDM.onclick = () => {
@@ -169,72 +173,69 @@ async function assignRoles(roomId) {
       menu.remove();
     };
     menu.appendChild(btnDM);
-if (role === "wolf" && currentPhase === "night") {
-  const btnKill = document.createElement("button");
-  btnKill.textContent = "キル";
-  btnKill.onclick = () => {
-    const target = msg.name;
-    const input = prompt(`${target}のフルネームを入力してください`);
-    if (input === target) {
-      db.ref(`rooms/${roomId}/kills/${playerName}`).set(target);
-      alert("キル成功！");
-    } else {
-      alert("キル失敗（名前が一致しません）");
+
+    if (role === "wolf" && currentPhase === "night") {
+      const btnKill = document.createElement("button");
+      btnKill.textContent = "キル";
+      btnKill.onclick = () => {
+        const target = msg.name;
+        const input = prompt(`${target}のフルネームを入力してください`);
+        if (input === target) {
+          db.ref(`rooms/${roomId}/kills/${playerName}`).set(target);
+          alert("キル成功！");
+        } else {
+          alert("キル失敗（名前が一致しません）");
+        }
+        menu.remove();
+      };
+      menu.appendChild(btnKill);
     }
-    menu.remove();
-  };
-  menu.appendChild(btnKill);
-}
 
-if (role === "wolf" && currentPhase === "night" && !usedShinigamiEye) {
-  const btnEye = document.createElement("button");
-  btnEye.textContent = "死神の目";
-  btnEye.onclick = () => {
-    db.ref(`rooms/${roomId}/shinigami/${playerName}`).set(msg.name);
-    alert(`${msg.name} のフルネームは: ${msg.name}`);
-    usedShinigamiEye = true;
-    menu.remove();
-  };
-  menu.appendChild(btnEye);
-}
+    if (role === "wolf" && currentPhase === "night" && !usedShinigamiEye) {
+      const btnEye = document.createElement("button");
+      btnEye.textContent = "死神の目";
+      btnEye.onclick = () => {
+        db.ref(`rooms/${roomId}/shinigami/${playerName}`).set(msg.name);
+        alert(`${msg.name} のフルネームは: ${msg.name}`);
+        usedShinigamiEye = true;
+        menu.remove();
+      };
+      menu.appendChild(btnEye);
+    }
 
-if (currentPhase === "evening") {
-  const btnVote = document.createElement("button");
-  btnVote.textContent = "投票する";
-  btnVote.onclick = () => {
-    db.ref(`rooms/${roomId}/votes/${playerName}`).set(msg.name);
-    alert(`あなたは ${msg.name} に投票しました`);
-    menu.remove();
-  };
-  menu.appendChild(btnVote);
-}
+    if (currentPhase === "evening") {
+      const btnVote = document.createElement("button");
+      btnVote.textContent = "投票する";
+      btnVote.onclick = () => {
+        db.ref(`rooms/${roomId}/votes/${playerName}`).set(msg.name);
+        alert(`あなたは ${msg.name} に投票しました`);
+        menu.remove();
+      };
+      menu.appendChild(btnVote);
+    }
 
-const btnDetective = document.createElement("button");
-btnDetective.textContent = "探偵";
-btnDetective.onclick = () => {
-  const gmRoomId = `${roomId}-gm-${playerName}`;
-  window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
-  menu.remove();
-};
-menu.appendChild(btnDetective);
+    const btnDetective = document.createElement("button");
+    btnDetective.textContent = "探偵";
+    btnDetective.onclick = () => {
+      const gmRoomId = `${roomId}-gm-${playerName}`;
+      window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+      menu.remove();
+    };
+    menu.appendChild(btnDetective);
+
     anchorEl.parentElement.appendChild(menu);
   }
 
-  }
-
   // ======================================================
-  // Firebase ベースのフェーズ管理 & 人数制御
+  // Firebase ベースのフェーズ管理
   // ======================================================
   const PHASE_ORDER = ["morning", "day", "evening", "night"];
-  const PHASE_LENGTHS = {
-    morning: 60, day: 6 * 60, evening: 2 * 60, night: 2 * 60
-  };
-  const REQUIRED_PLAYERS = 8;
+  const PHASE_LENGTHS = { morning: 60, day: 6 * 60, evening: 2 * 60, night: 2 * 60 };
+  // const REQUIRED_PLAYERS = 8;
 
   let localTimerInterval = null;
   let prevPlayerKeys = [];
 
-  // フェーズ開始（DBに保存）
   function startPhaseInDB(phase, day, durationSec) {
     const endAt = Date.now() + durationSec * 1000;
     actionsRef.set({});
@@ -255,7 +256,6 @@ menu.appendChild(btnDetective);
     messagesRef.push({ text: `-- ${nextDay}日目 ${nextPhase} 開始 --`, name: "システム", time: Date.now() });
   }
 
-  // state監視
   stateRef.on("value", (snap) => {
     const s = snap.val() || {};
     const phase = s.phase || "day";
@@ -263,6 +263,8 @@ menu.appendChild(btnDetective);
     const phaseEndAt = s.phaseEndAt || null;
     const phasePaused = s.phasePaused || false;
     const pausedRemaining = s.pausedRemaining || null;
+
+    currentPhase = phase;
 
     const phaseLabel = { morning: "朝", day: "昼", evening: "夕方", night: "夜" }[phase] || phase;
     if (phaseInfoEl) phaseInfoEl.textContent = `Day ${day} — ${phaseLabel}`;
@@ -296,42 +298,6 @@ menu.appendChild(btnDetective);
     localTimerInterval = setInterval(updateLocalTimer, 500);
   });
 
-  // プレイヤー人数監視
-  playersListRef.on("value", (snap) => {
-    const obj = snap.val() || {};
-    const keys = Object.keys(obj);
-    const count = keys.length;
-
-    // 入退室ログ
-    const left = prevPlayerKeys.filter(k => !keys.includes(k));
-    const joined = keys.filter(k => !prevPlayerKeys.includes(k));
-    prevPlayerKeys = keys.slice();
-    left.forEach(name => messagesRef.push({ text: `${name} が退室しました。`, name: "システム", time: Date.now() }));
-    joined.forEach(name => messagesRef.push({ text: `${name} が入室しました。`, name: "システム", time: Date.now() }));
-
-    // 人数不足チェック
-    stateRef.once("value").then(stSnap => {
-      const st = stSnap.val() || {};
-      if (count < REQUIRED_PLAYERS) {
-        if (!st.phasePaused) {
-          const endAt = st.phaseEndAt || null;
-          let remaining = null;
-          if (endAt) remaining = Math.max(0, Math.floor((endAt - Date.now()) / 1000));
-          stateRef.update({ phasePaused: true, pausedRemaining: remaining, phaseEndAt: null });
-          messagesRef.push({ text: `人数が ${count} 人になったため一時停止。`, name: "システム", time: Date.now() });
-        }
-      } else {
-        if (st.phasePaused && isGm) {
-          const rem = st.pausedRemaining;
-          const resume = (rem != null) ? rem : PHASE_LENGTHS[st.phase];
-          const newEndAt = Date.now() + resume * 1000;
-          stateRef.update({ phasePaused: false, phaseEndAt: newEndAt, pausedRemaining: null });
-          messagesRef.push({ text: `人数が揃いました。ゲームを再開します。`, name: "システム", time: Date.now() });
-        }
-      }
-    });
-  });
-
   // --- 行動完了ボタン ---
   actionBtn.addEventListener("click", () => {
     actionsRef.child(playerName).set(true);
@@ -339,7 +305,6 @@ menu.appendChild(btnDetective);
     actionStatus.style.display = "block";
   });
 
-  // --- 全員の行動完了を監視 ---
   actionsRef.on("value", async (snap) => {
     const actions = snap.val() || {};
     const playersSnap = await playersListRef.once("value");
