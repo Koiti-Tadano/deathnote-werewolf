@@ -79,7 +79,7 @@ document.getElementById("createRoomBtn").addEventListener("click", () => {
   }
 
   localStorage.setItem("playerName", playerName);
-　localStorage.setItem("roomId", newRoomId);
+　
   const newRoomId = generateRoomId();
 
   firebase.database().ref("rooms/" + newRoomId).set({
@@ -105,8 +105,7 @@ document.getElementById("joinRoomBtn").addEventListener("click", () => {
   }
 
   localStorage.setItem("playerName", playerName);
-　localStorage.setItem("roomId", roomId);
-  window.location.href = `chat.html?room=${roomId}&name=${encodeURIComponent(playerName)}`;
+　  window.location.href = `chat.html?room=${roomId}&name=${encodeURIComponent(playerName)}`;
 });
 
 // コピー機能
