@@ -16,14 +16,26 @@ const playerInfoEl = document.getElementById("playerInfo");
 if (roomInfoEl)   roomInfoEl.textContent   = "ルームID: " + roomId;
 if (playerInfoEl) playerInfoEl.textContent = "あなた: " + playerName;
 
+
 // メッセージ参照
 const messagesRef = db.ref("rooms/" + roomId + "/messages");
 
-// 送信
+// 入力欄とボタンを取得
+const msgInput = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const messagesList = document.getElementById("messages");
+
+// メッセージ送信
 sendBtn.addEventListener("click", () => {
   const text = msgInput.value;
   if (text.trim() === "") return;
-  messagesRef.push({ text, name: playerName, time: Date.now() });
+
+  messagesRef.push({
+    text: text,
+    name: playerName,
+    time: Date.now()
+  });
+
   msgInput.value = "";
 });
 
