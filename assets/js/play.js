@@ -1,4 +1,3 @@
-lobby
 document.addEventListener("DOMContentLoaded", () => {
   const db = firebase.database();
   const roomId = "defaultRoom"; // 実際は動的に取得するならURLから取ってもOK
