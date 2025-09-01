@@ -85,57 +85,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== メッセージ受信（吹き出し風に修正）=====
-  messagesRef.on("child_added", (snap) => {
-    const msg = snap.val();
-    const li = document.createElement("li");
+// ===== メッセージ受信（LINE風表示）=====
+messagesRef.on("child_added", (snap) => {
+  const msg = snap.val();
+  const li = document.createElement("li");
 
-    if (msg.name === "システム") {
-      li.className = "system-message";
-      li.textContent = msg.text;
+  if (msg.name === "システム") {
+    li.className = "system-message";
+    li.textContent = msg.text;
+  } else {
+    const isMe = msg.name === playerName;
+    li.className = isMe ? "my-message" : "other-message";
+
+    if (isMe) {
+      li.innerHTML = `
+        <div class="msg-row self">
+          <div class="icon">${msg.name[0]}</div>
+          <div class="name">${msg.name}</div>
+          <div class="bubble green">${msg.text}</div>
+        </div>
+      `;
     } else {
-      li.className = (msg.name === playerName) ? "my-message" : "other-message";
-
-
-      const icon = document.createElement("div");
-icon.className = "icon";
-icon.textContent = msg.name[0]; // 先頭文字を仮アイコンに
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = msg.text;
-
-      const nameSpan = document.createElement("div");
-      nameSpan.className = "msg-name";
-      nameSpan.textContent = msg.name;
-　　　　li.className = (msg.name === playerName) ? "my-message" : "other-message";
-
-if (msg.name === playerName) {
-  li.innerHTML = `
-    <div class="msg-row self">
-      <div class="bubble">${msg.text}</div>
-      <div class="icon">${msg.name[0]}</div>
-    </div>
-  `;
-} else {
-  li.innerHTML = `
-    <div class="msg-row other">
-      <div class="icon">${msg.name[0]}</div>
-      <div class="bubble">${msg.text}</div>
-    </div>
-  `;
-}
-      if (msg.name === playerName) {
-        li.appendChild(bubble);
-        li.appendChild(nameSpan);
-      } else {
-        li.appendChild(nameSpan);
-        li.appendChild(bubble);
-      }
+      li.innerHTML = `
+        <div class="msg-row other">
+          <div class="icon">${msg.name[0]}</div>
+          <div class="name">${msg.name}</div>
+          <div class="bubble white">${msg.text}</div>
+        </div>
+      `;
     }
-    messagesList.appendChild(li);
-    messagesList.scrollTop = messagesList.scrollHeight;
-  });
+  }
+
+  messagesList.appendChild(li);
+  messagesList.scrollTop = messagesList.scrollHeight;
+});
 
   // ===== 自分の状態監視（alive / 役職 / UI）=====
   playersRef.on("value", (snap) => {
