@@ -277,19 +277,22 @@ small{color:var(--muted)}
   display: flex;
   align-items: flex-end;
   margin: 6px 0;
+  font-size: 0.7rem; /* 全体を小さめに */
 }
 
 .msg-row.self {
   justify-content: flex-end; /* 右寄せ */
+  text-align: right;
 }
 
 .msg-row.other {
   justify-content: flex-start; /* 左寄せ */
+  text-align: left;
 }
 
 .icon {
-  width: 32px;
-  height: 32px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   background: #ccc;
   color: #fff;
@@ -297,13 +300,14 @@ small{color:var(--muted)}
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 6px;
+  margin: 0 4px;
 }
 
 .name {
-  font-size: 12px;
+  font-size: 0.7rem;
   color: #666;
   margin: 0 4px;
+  align-self: center;
 }
 
 .bubble {
@@ -311,13 +315,18 @@ small{color:var(--muted)}
   padding: 6px 10px;
   border-radius: 12px;
   word-wrap: break-word;
+  overflow-wrap: break-word; /* ↑の保険 */
+  word-break: keep-all;      /* 日本語はできるだけ改行しない */
+  white-space: pre-wrap;
 }
 
 .bubble.green {
   background: #9fe88d; /* LINE風緑 */
+  margin-left: 6px;
 }
 
 .bubble.white {
   background: #fff; /* 白吹き出し */
   border: 1px solid #ccc;
+  margin-right: 6px;
 }
