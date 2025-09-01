@@ -71,16 +71,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if (roomInfoEl) roomInfoEl.textContent = `ルームID: ${roomId}`;
   if (playerInfoEl) playerInfoEl.textContent = `あなた: ${playerName}`;
 
-  // --- GM 用 ---
-  const isGm = localStorage.getItem("isGm") === "true";
-  if (isGm) {
-    document.getElementById("gmControls").style.display = "block";
+// --- GM 用コントロール表示 ---
+const isGm = localStorage.getItem("isGm") === "true";
+if (isGm) {
+  const gmControls = document.getElementById("gmControls");
+  if (gmControls) gmControls.style.display = "block";
 
-    document.getElementById("startGameBtn").addEventListener("click", async () => {
+  const startBtn = document.getElementById("startGameBtn");
+  if (startBtn) {
+    startBtn.addEventListener("click", async () => {
       await assignRoles(roomId);
       startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
     });
   }
+}
 
   
   // --- メッセージ送信 ---
