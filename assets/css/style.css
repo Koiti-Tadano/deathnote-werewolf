@@ -276,14 +276,17 @@ small{color:var(--muted)}
 .msg-row {
   display: flex;
   align-items: flex-end;
-  margin: 4px 0;
+  margin: 6px 0;
 }
+
 .msg-row.self {
-  justify-content: flex-end;
+  justify-content: flex-end; /* 右寄せ */
 }
+
 .msg-row.other {
-  justify-content: flex-start;
+  justify-content: flex-start; /* 左寄せ */
 }
+
 .icon {
   width: 32px;
   height: 32px;
@@ -296,12 +299,25 @@ small{color:var(--muted)}
   justify-content: center;
   margin: 0 6px;
 }
+
+.name {
+  font-size: 12px;
+  color: #666;
+  margin: 0 4px;
+}
+
 .bubble {
   max-width: 60%;
   padding: 6px 10px;
   border-radius: 12px;
-  background: #eee;
+  word-wrap: break-word;
 }
-.msg-row.self .bubble {
-  background: #9fe88d; /* LINE風の緑 */
+
+.bubble.green {
+  background: #9fe88d; /* LINE風緑 */
+}
+
+.bubble.white {
+  background: #fff; /* 白吹き出し */
+  border: 1px solid #ccc;
 }
