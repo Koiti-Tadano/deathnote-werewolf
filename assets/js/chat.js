@@ -200,8 +200,6 @@ if (role === "detective" && currentPhase === "night") {
   };
   menu.appendChild(btnDetective);
 }
-
-}
   
   // --- GM 用 ---
   const isGm = localStorage.getItem("isGm") === "true";
