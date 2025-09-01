@@ -312,11 +312,10 @@ small{color:var(--muted)}
 
 .bubble {
   max-width: 60%;
+  min-width: 15em;
   padding: 6px 10px;
   border-radius: 12px;
-  word-wrap: break-word;
-  overflow-wrap: break-word; /* ↑の保険 */
-  word-break: keep-all;      /* 日本語はできるだけ改行しない */
+  word-break: break-word; /* 不自然な改行を防ぎつつ */
   white-space: pre-wrap;
 }
 
