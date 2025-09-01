@@ -428,4 +428,40 @@ function togglePanel(id) {
   const el = document.getElementById(id);
   el.style.display = (el.style.display === "block") ? "none" : "block";
 }
+  // chat.js の DOMContentLoaded の最後あたり
+playersRef.once("value").then(snap => {
+  const me = snap.val() || {};
+  if (me.role) {
+    document.getElementById("profileContent").innerHTML = `
+      <div class="card">
+        <b>役職: ${me.role}</b><br>
+        服装: ${me.profile?.outfit}<br>
+        好き: ${me.profile?.like}<br>
+        嫌い: ${me.profile?.dislike}<br>
+        得意: ${me.profile?.strong}<br>
+        苦手: ${me.profile?.weak}
+        <small>共有</small>
+      </div>
+    `;
+
+    document.getElementById("itemsContent").innerHTML = `
+      <div class="card">
+        <b>名刺</b><br>
+        ${me.fullName}<br>
+        ${toKatakana(me.fullName)}
+        <small>共有</small>
+      </div>
+      ${(me.infoCards || []).map(c => `
+        <div class="card">
+          ${c}
+          <small>共有</small>
+        </div>`).join("")}
+    `;
+  }
+});
+
+function toKatakana(str) {
+  // 仮: 名前部分だけをカタカナに変換して返す
+  return str.replace(/[a-zA-Zぁ-ん]/g, "カタカナ");
+}
 }); // DOMContentLoaded end
