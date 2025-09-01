@@ -325,7 +325,40 @@ if (role === "detective" && currentPhase === "night") {
 }
 
 }
+function generateInfoCard(role, fullName, profile, allProfiles, selfName) {
+  const cards = [];
 
+  if (role === "madman") {
+    // 狂人は他の市民のプロフィールから生成
+    const villagerNames = Object.keys(allProfiles).filter(n => n !== selfName);
+    const target = allProfiles[villagerNames[Math.floor(Math.random() * villagerNames.length)]];
+    cards.push(`人狼は ${target.outfit} を着ている`);
+    cards.push(`人狼は ${target.like} が好き`);
+  } else if (role !== "wolf") {
+    // 一般市民 or 探偵 → 人狼情報
+    cards.push(`人狼は ${profile.outfit} を着ている`);
+    cards.push(`人狼は ${profile.like} が好き`);
+    cards.push(`人狼は ${profile.dislike} が嫌い`);
+  }
+
+  return cards;
+}
+function addWolfVowelHint(roomId, players) {
+  const wolf = Object.entries(players).find(([_, p]) => p.role === "wolf");
+  if (!wolf) return;
+  const wolfName = wolf[0];
+  const fullName = wolf[1].fullName;
+  const vowels = (fullName.match(/[aiueoアイウエオ]/gi) || []).length;
+
+  // 配布先 = 人狼以外のランダム1人
+  const candidates = Object.entries(players).filter(([_, p]) => p.role !== "wolf");
+  if (candidates.length === 0) return;
+  const [targetName, targetData] = candidates[Math.floor(Math.random() * candidates.length)];
+
+  firebase.database().ref(`rooms/${roomId}/players/${targetName}/infoCards`).push(
+    `人狼のフルネームには母音が ${vowels} 個含まれている`
+  );
+}
   // ======================================================
   // Firebase ベースのフェーズ管理
   // ======================================================
