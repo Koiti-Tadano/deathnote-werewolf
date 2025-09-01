@@ -1,4 +1,3 @@
-DOMContentLoaded
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // --- URL / localStorage から情報取得 ---
@@ -416,5 +415,16 @@ if (role === "detective" && currentPhase === "night") {
       nextPhaseInDB(st.phase, st.day);
     }
   });
+// chat.js の DOMContentLoaded 内に追加
+document.getElementById("profileBtn").addEventListener("click", () => {
+  togglePanel("profilePanel");
+});
+document.getElementById("itemsBtn").addEventListener("click", () => {
+  togglePanel("itemsPanel");
+});
 
+function togglePanel(id) {
+  const el = document.getElementById(id);
+  el.style.display = (el.style.display === "block") ? "none" : "block";
+}
 }); // DOMContentLoaded end
