@@ -71,6 +71,18 @@ document.addEventListener("DOMContentLoaded", () => {
   if (roomInfoEl) roomInfoEl.textContent = `ルームID: ${roomId}`;
   if (playerInfoEl) playerInfoEl.textContent = `あなた: ${playerName}`;
 
+  // --- GM 用 ---
+  const isGm = localStorage.getItem("isGm") === "true";
+  if (isGm) {
+    document.getElementById("gmControls").style.display = "block";
+
+    document.getElementById("startGameBtn").addEventListener("click", async () => {
+      await assignRoles(roomId);
+      startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
+    });
+  }
+
+  
   // --- メッセージ送信 ---
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
@@ -201,16 +213,6 @@ if (role === "detective" && currentPhase === "night") {
   menu.appendChild(btnDetective);
 }
   
-  // --- GM 用 ---
-  const isGm = localStorage.getItem("isGm") === "true";
-  if (isGm) {
-    document.getElementById("gmControls").style.display = "block";
-
-    document.getElementById("startGameBtn").addEventListener("click", async () => {
-      await assignRoles(roomId);
-      startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
-    });
-  }
 
   // --- 役職割り当て関数 ---
   async function assignRoles(roomId) {
