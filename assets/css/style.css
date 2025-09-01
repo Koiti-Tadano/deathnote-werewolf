@@ -267,7 +267,7 @@ small{color:var(--muted)}
 
 
 #topRightButtons {
-  margin-top: 1rem;   /* 上に余白 */
+  margin-top: 10rem;   /* 上に余白 */
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end; /* 右寄せ */
