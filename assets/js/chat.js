@@ -65,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
-
   // ===== メッセージ送信 =====
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
@@ -97,6 +96,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       li.className = (msg.name === playerName) ? "my-message" : "other-message";
 
+
+      const icon = document.createElement("div");
+icon.className = "icon";
+icon.textContent = msg.name[0]; // 先頭文字を仮アイコンに
+
       const bubble = document.createElement("div");
       bubble.className = "bubble";
       bubble.textContent = msg.text;
@@ -104,7 +108,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const nameSpan = document.createElement("div");
       nameSpan.className = "msg-name";
       nameSpan.textContent = msg.name;
+　　　　li.className = (msg.name === playerName) ? "my-message" : "other-message";
 
+if (msg.name === playerName) {
+  li.innerHTML = `
+    <div class="msg-row self">
+      <div class="bubble">${msg.text}</div>
+      <div class="icon">${msg.name[0]}</div>
+    </div>
+  `;
+} else {
+  li.innerHTML = `
+    <div class="msg-row other">
+      <div class="icon">${msg.name[0]}</div>
+      <div class="bubble">${msg.text}</div>
+    </div>
+  `;
+}
       if (msg.name === playerName) {
         li.appendChild(bubble);
         li.appendChild(nameSpan);
