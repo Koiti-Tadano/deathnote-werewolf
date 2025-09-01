@@ -5,85 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>部屋チャット | デスノート人狼（非公式）</title>
   <link rel="stylesheet" href="assets/css/style.css">
-
-  <!-- Firebase SDK は chat.js の前に必要 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-  <!-- firebase-config.js をここで読み込み（初期化済みであること） -->
   <script src="assets/js/firebase-config.js"></script>
-  <!-- chat.js は body の最後で読み込む -->
+  <style>
+    .bubble { max-width:70%; margin:4px; padding:6px 10px; border-radius:8px; font-size:0.9em; display:inline-block;}
+    .my-bubble { background:#000; color:#fff; float:right; clear:both; text-align:right;}
+    .other-bubble { background:#eee; float:left; clear:both;}
+    .side-panel { display:none; position:absolute; right:10px; top:50px; width:200px; background:#fff; border:1px solid #ccc; padding:10px;}
+    .card { border:1px solid #ccc; padding:5px; margin-bottom:5px; font-size:0.85em;}
+  </style>
 </head>
 <body>
-  <div class="nav">
-    <div class="nav-inner">
-      <div class="brand">
-        <div class="logo">DN</div>
-        <div class="title">デスノート人狼（非公式）</div>
-      </div>
-      <details class="nav-accordion">
-        <summary>メニュー</summary>
-        <div class="menu">
-          <a class="button" href="index.html"><strong>ゲームを終了</strong></a>
-          <button class="button" id="openRules"><strong>ルールを参照</strong></button>
-        </div>
-      </details>
-    </div>
-  </div>
+  <div class="nav"><h2>デスノート人狼</h2></div>
 
   <main class="container">
-    <h1>部屋チャット</h1>
-<div id="phaseInfo">現在のフェーズ: --</div>
-<div id="phaseTimer">残り時間: --</div>
-    <div id="roomInfo" style="margin-bottom:.5rem"></div>
-    <div id="playerInfo" style="margin-bottom:1rem"></div>
-<!-- chat.html の右上あたりに追加 -->
-<div id="topRightButtons">
-  <button id="profileBtn">プロフィール</button>
-  <button id="itemsBtn">持ち物</button>
-</div>
-
-<div id="profilePanel" class="side-panel">
-  <h3>プロフィール</h3>
-  <div id="profileContent"></div>
-</div>
-
-<div id="itemsPanel" class="side-panel">
-  <h3>持ち物</h3>
-  <div id="itemsContent"></div>
-</div>
-    <div id="chatBox">
-      <ul id="messages"></ul>
+    <div id="roomInfo"></div>
+    <div id="playerInfo"></div>
+    <div id="topRightButtons">
+      <button id="profileBtn">プロフィール</button>
+      <button id="itemsBtn">持ち物</button>
     </div>
+    <div id="profilePanel" class="side-panel"><h3>プロフィール</h3><div id="profileContent"></div></div>
+    <div id="itemsPanel" class="side-panel"><h3>持ち物</h3><div id="itemsContent"></div></div>
+
+    <div id="phaseInfo"></div>
+    <div id="phaseTimer"></div>
+
+    <ul id="messages"></ul>
 
     <div class="chat-input">
       <input id="msgInput" placeholder="メッセージを入力">
       <button id="sendBtn">送信</button>
     </div>
 
-    <!-- フェーズ表示（フェーズ管理用） -->
-    <div id="phaseInfo" style="margin-top:.5rem"></div>
-    <div id="phaseTimer" style="margin-bottom:1rem"></div>
     <div id="actionArea">
-  <button id="actionDoneBtn">行動完了</button>
-  <div id="actionStatus" style="display:none;">全員の行動が終了するまでお待ちください…</div>
-</div>
+      <button id="actionDoneBtn">行動完了</button>
+      <div id="actionStatus" style="display:none;">全員の行動が終了するまでお待ちください…</div>
+    </div>
+
     <div id="gmControls" style="display:none;">
-  <button id="startGameBtn">ゲーム開始</button>
-</div>
+      <button id="startGameBtn">ゲーム開始</button>
+    </div>
   </main>
 
-  <!-- モーダル（非表示のルール画面） -->
-  <div id="rulesModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close-btn" id="closeRules">&times;</span>
-      <h2>ルール</h2>
-      <p class="rules-note">※ 簡易版です。見やすいのは <a href="rules.html" target="_blank">ルール画面</a> から。</p>
-      <div id="rulesContent" class="rules-body"></div>
-    </div>
-  </div>
-
-  <!-- 自作スクリプト（ここで読み込む） -->
   <script src="assets/js/chat.js"></script>
 </body>
 </html>
