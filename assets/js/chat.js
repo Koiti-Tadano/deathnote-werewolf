@@ -185,6 +185,16 @@ async function assignRoles(roomId) {
     time: Date.now()
   });
 }
+// 自分の役職を監視して表示
+playersRef.child("role").on("value", (snap) => {
+  const myRole = snap.val();
+  if (myRole) {
+    const roleEl = document.getElementById("myRole") || document.createElement("div");
+    roleEl.id = "myRole";
+    roleEl.innerHTML = `<strong>あなたの役職:</strong> ${myRole}`;
+    document.body.appendChild(roleEl);
+  }
+});
 const fakeSurnames = [
   "佐原木","神代川","高森田","藤宮堂","北条木","桐沢谷","篠原江","葛城井","綾峰","東雲木",
   "氷川原","鷹森","葉月川","橘野","秋津原","久遠木","真田沢","花村江","水城田","黒川谷",
