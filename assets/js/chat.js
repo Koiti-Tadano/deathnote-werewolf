@@ -1,3 +1,4 @@
+function generateInfoCard
 DOMContentLoaded
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
