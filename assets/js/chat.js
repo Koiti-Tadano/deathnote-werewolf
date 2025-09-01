@@ -127,6 +127,82 @@ document.addEventListener("DOMContentLoaded", () => {
     messagesList.scrollTop = messagesList.scrollHeight;
   });
 
+  // --- アクションメニュー ---
+  let role = null;
+  let currentPhase = "day";
+  let usedShinigamiEye = false;
+
+  function openActionMenu(anchorEl, msg) {
+    const prev = document.querySelector(".action-menu");
+    if (prev) prev.remove();
+
+    const menu = document.createElement("div");
+    menu.className = "action-menu";
+
+    // 個別チャット
+    const btnDM = document.createElement("button");
+    btnDM.textContent = "個別チャット";
+    btnDM.onclick = () => {
+      const ids = [playerName, msg.name].sort();
+      const privateRoomId = `${roomId}-dm-${ids[0]}-${ids[1]}`;
+      window.open(`chat.html?room=${privateRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+      menu.remove();
+    };
+    menu.appendChild(btnDM);
+
+    if (role === "wolf" && currentPhase === "night") {
+      const btnKill = document.createElement("button");
+      btnKill.textContent = "キル";
+      btnKill.onclick = () => {
+        const target = msg.name;
+        const input = prompt(`${target}のフルネームを入力してください`);
+        if (input === target) {
+          db.ref(`rooms/${roomId}/players/${target}`).update({ alive: false });
+          alert("キル成功！");
+        } else {
+          alert("キル失敗（名前が一致しません）");
+        }
+        menu.remove();
+      };
+      menu.appendChild(btnKill);
+    }
+
+    if (role === "wolf" && currentPhase === "night" && !usedShinigamiEye) {
+      const btnEye = document.createElement("button");
+      btnEye.textContent = "死神の目";
+      btnEye.onclick = () => {
+        db.ref(`rooms/${roomId}/shinigami/${playerName}`).set(msg.name);
+        alert(`${msg.name} のフルネームは: ${msg.name}`);
+        usedShinigamiEye = true;
+        menu.remove();
+      };
+      menu.appendChild(btnEye);
+    }
+
+    if (currentPhase === "evening") {
+      const btnVote = document.createElement("button");
+      btnVote.textContent = "投票する";
+      btnVote.onclick = () => {
+        db.ref(`rooms/${roomId}/votes/${playerName}`).set(msg.name);
+        alert(`あなたは ${msg.name} に投票しました`);
+        menu.remove();
+      };
+      menu.appendChild(btnVote);
+    }
+
+if (role === "detective" && currentPhase === "night") {
+  const btnDetective = document.createElement("button");
+  btnDetective.textContent = "探偵";
+  btnDetective.onclick = () => {
+    const gmRoomId = `${roomId}-gm-${playerName}`;
+    window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+    menu.remove();
+  };
+  menu.appendChild(btnDetective);
+}
+
+}
+  
   // --- GM 用 ---
   const isGm = localStorage.getItem("isGm") === "true";
   if (isGm) {
