@@ -264,3 +264,11 @@ small{color:var(--muted)}
   font-size: 10px;
   opacity: 0.7;
 }
+
+
+#topRightButtons {
+  margin-top: 1rem;   /* 上に余白 */
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end; /* 右寄せ */
+}
