@@ -1,3 +1,4 @@
+DOMContentLoaded
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // --- URL / localStorage から情報取得 ---
