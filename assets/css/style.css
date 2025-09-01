@@ -272,3 +272,36 @@ small{color:var(--muted)}
   gap: 0.5rem;
   justify-content: flex-end; /* 右寄せ */
 }
+
+.msg-row {
+  display: flex;
+  align-items: flex-end;
+  margin: 4px 0;
+}
+.msg-row.self {
+  justify-content: flex-end;
+}
+.msg-row.other {
+  justify-content: flex-start;
+}
+.icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ccc;
+  color: #fff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 6px;
+}
+.bubble {
+  max-width: 60%;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #eee;
+}
+.msg-row.self .bubble {
+  background: #9fe88d; /* LINE風の緑 */
+}
