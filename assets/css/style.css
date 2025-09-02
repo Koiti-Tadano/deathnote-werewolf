@@ -299,14 +299,14 @@ small{color:var(--muted)}
 
 /* アイコン */
 .icon {
-  width: 28px;
-  height: 28px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   background: #cfcfcf;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 10px;
   margin: 0 6px;
   flex-shrink: 0;
 }
@@ -324,7 +324,7 @@ small{color:var(--muted)}
   padding: 8px 12px;
   border-radius: 16px;
   /* 1行に収まる最大文字数を 15ch に設定 */
-  max-width: 15ch;
+  max-width: 25ch;
   min-width: 2ch;       /* 1〜2文字のときも変に潰れないように */
   
   /* 自然な改行制御 */
