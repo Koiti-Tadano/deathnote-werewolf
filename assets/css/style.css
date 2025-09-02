@@ -272,30 +272,37 @@ small{color:var(--muted)}
   gap: 0.5rem;
   justify-content: flex-end; /* 右寄せ */
 }
-
+/* 行全体 */
 .msg-row {
   display: flex;
   align-items: flex-end;
-  margin: 4px 0;
+  margin: 6px 0;
   font-size: 0.9rem;
 }
 
-.msg-row.other {
-  justify-content: flex-start;
-  text-align: left;
+/* 左右寄せ */
+.msg-row.other { justify-content: flex-start; }
+.msg-row.self  { justify-content: flex-end; }
+
+/* 名前＋吹き出しの縦並び */
+.msg-content {
+  display: flex;
+  flex-direction: column;
+  /* アイコン幅(28) + マージン(12) を差し引いて最大幅を取る */
+  max-width: calc(100% - 48px);
+  box-sizing: border-box;
 }
 
-.msg-row.self {
-  justify-content: flex-end;
-  text-align: right;
-}
+/* 他人は左揃え、自己は右揃え */
+.msg-row.other .msg-content { align-items: flex-start; }
+.msg-row.self  .msg-content { align-items: flex-end; }
 
 /* アイコン */
 .icon {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #ccc;
+  background: #cfcfcf;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -304,11 +311,11 @@ small{color:var(--muted)}
   flex-shrink: 0;
 }
 
-/* 名前を吹き出しの上に表示（LINE風） */
+/* 名前（吹き出しの上） */
 .msg-name {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: #666;
-  margin: 0 4px;
+  margin-bottom: 4px;
 }
 
 /* 吹き出し */
@@ -316,26 +323,23 @@ small{color:var(--muted)}
   display: inline-block;
   padding: 8px 12px;
   border-radius: 16px;
+  /* 最小文字幅（おおよそ15文字分）を確保、狭い画面では幅に合わせる */
+  min-width: min(15ch, 60%);
   max-width: 65%;
-  word-break: break-word;
-  white-space: pre-wrap;
+  word-break: normal;           /* 不自然な場所で切れないように */
+  overflow-wrap: break-word;    /* 長い単語は折り返す */
+  white-space: pre-wrap;        /* 改行を尊重しつつ折り返す */
+  box-sizing: border-box;
 }
 
-/* 他人の吹き出し（白） */
-.other .bubble {
-  background: #fff;
-  border: 1px solid #ddd;
-}
+/* 色 */
+.msg-row.other .bubble { background: #fff; border: 1px solid #ddd; color: #000; }
+.msg-row.self  .bubble { background: #9de47f; color: #000; }
 
-/* 自分の吹き出し（緑） */
-.self .bubble {
-  background: #9de47f;
-  color: #000;
-}
-
-/* 吹き出し＋名前を縦並びにする */
-.msg-content {
-  display: flex;
-  flex-direction: column;
-  max-width: 65%;
+/* システムメッセージ */
+.system-message {
+  text-align: center;
+  color: #888;
+  font-size: 0.85rem;
+  margin: 8px 0;
 }
