@@ -85,39 +85,51 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-// ===== メッセージ受信（LINE風表示）=====
+// ===== メッセージ受信（LINE風：アイコン＋名前＋吹き出し）=====
 messagesRef.on("child_added", (snap) => {
   const msg = snap.val();
   const li = document.createElement("li");
 
+  // システムメッセージ
   if (msg.name === "システム") {
     li.className = "system-message";
     li.textContent = msg.text;
-  } else {
-    const isSelf = (msg.name === playerName);
-    li.className = "msg-row " + (isSelf ? "self" : "other");
+    messagesList.appendChild(li);
+    messagesList.scrollTop = messagesList.scrollHeight;
+    return;
+  }
 
-    if (isSelf) {
-      // 自分のメッセージ（右詰め）
-      li.innerHTML = `
-        <div class="msg-name">${msg.name}</div>
-        <div class="icon">${msg.name[0]}</div>
-      `;
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = msg.text;
-      li.appendChild(bubble);
-    } else {
-      // 他人のメッセージ（左詰め）
-      li.innerHTML = `
-        <div class="icon">${msg.name[0]}</div>
-        <div class="msg-name">${msg.name}</div>
-      `;
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = msg.text;
-      li.appendChild(bubble);
-    }
+  // row 本体（self / other）
+  const isSelf = msg.name === playerName;
+  li.className = `msg-row ${isSelf ? "self" : "other"}`;
+
+  // アイコン
+  const icon = document.createElement("div");
+  icon.className = "icon";
+  icon.textContent = msg.name ? msg.name.charAt(0) : "?";
+
+  // 名前＋吹き出しをまとめるコンテナ
+  const msgContent = document.createElement("div");
+  msgContent.className = "msg-content";
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "msg-name";
+  nameDiv.textContent = msg.name || "名無し";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = msg.text;
+
+  // 構造：他人は [icon][content]、自分は [content][icon]
+  msgContent.appendChild(nameDiv);
+  msgContent.appendChild(bubble);
+
+  if (isSelf) {
+    li.appendChild(msgContent);
+    li.appendChild(icon);
+  } else {
+    li.appendChild(icon);
+    li.appendChild(msgContent);
   }
 
   messagesList.appendChild(li);
