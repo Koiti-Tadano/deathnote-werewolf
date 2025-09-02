@@ -277,64 +277,50 @@ small{color:var(--muted)}
   display: flex;
   align-items: flex-end;
   margin: 6px 0;
-  font-size: 0.7rem; /* 全体を小さめに */
-}
-
-.msg-row.self {
-  justify-content: flex-end; /* 右寄せ */
-  text-align: right;
-  flex-wrap: nowrap;
 }
 
 .msg-row.other {
-  justify-content: flex-start; /* 左寄せ */
-  text-align: left;
-  flex-wrap: nowrap;
+  justify-content: flex-start;
 }
 
-.msg-row .bubble {
-  flex-shrink: 1; /* 吹き出しは縮小して収まる */
+.msg-row.self {
+  justify-content: flex-end;
 }
 
-.msg-row .icon {
-  flex-shrink: 0; /* アイコンは絶対に縮まない */
-}
 .icon {
-  width: 25px;
-  height: 25px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #ccc;
-  color: #fff;
-  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 4px;
+  font-size: 14px;
+  margin: 0 6px;
+  flex-shrink: 0;
 }
 
-.name {
-  font-size: 0.7rem;
+.msg-name {
+  font-size: 12px;
   color: #666;
-  margin: 0 4px;
-  align-self: center;
+  margin: 0 6px;
 }
 
 .bubble {
-  max-width: 60%;
-  min-width: 15em;
-  padding: 6px 10px;
-  border-radius: 12px;
-  word-break: break-word; /* 不自然な改行を防ぎつつ */
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 65%;
+  word-break: break-word;
   white-space: pre-wrap;
 }
 
-.bubble.green {
-  background: #9fe88d; /* LINE風緑 */
-  margin-left: 6px;
+.other .bubble {
+  background: #fff;
+  border: 1px solid #ddd;
 }
 
-.bubble.white {
-  background: #fff; /* 白吹き出し */
-  border: 1px solid #ccc;
-  margin-right: 6px;
+.self .bubble {
+  background: #9de47f;
+  color: #000;
 }
