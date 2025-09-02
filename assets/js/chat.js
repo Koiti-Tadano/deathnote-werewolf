@@ -135,7 +135,9 @@ messagesRef.on("child_added", (snap) => {
   messagesList.appendChild(li);
   messagesList.scrollTop = messagesList.scrollHeight;
 
-  messagesList.scrollTop = messagesList.scrollHeight;
+  setTimeout(() => {
+    messagesList.scrollTop = messagesList.scrollHeight;
+  }, 50);
 });
   // ===== 自分の状態監視（alive / 役職 / UI）=====
   playersRef.on("value", (snap) => {
