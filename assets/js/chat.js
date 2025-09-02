@@ -360,4 +360,111 @@ requestAnimationFrame(() => {
   function toKatakana(str) {
     return str.replace(/[a-zA-Zぁ-ん]/g, "カタカナ");
   }
+  // ===== 役職/プロフィール/カード配布 =====
+  async function assignRolesAndProfiles(roomId) {
+    const snap = await playersListRef.once("value");
+    const players = snap.val() || {};
+    const names = Object.keys(players);
+
+    // 役職リスト（人数に足りなければ villager）
+    const baseRoles = ["wolf","madman","detective","villager","villager","villager","villager"];
+    const roles = [];
+    for (let i = 0; i < names.length; i++) roles[i] = baseRoles[i] || "villager";
+
+    // シャッフル
+    for (let i = roles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [roles[i], roles[j]] = [roles[j], roles[i]];
+    }
+
+    // プロフィール生成（全員分まとめて先に作る）
+    const temp = {};
+    names.forEach(n => {
+      temp[n] = {
+        fullName: generateFullName(),
+        profile:  generateProfile()
+      };
+    });
+
+    // 各プレイヤーに割り当て
+    for (let i = 0; i < names.length; i++) {
+      const n = names[i];
+      const role = roles[i] || "villager";
+      const fullName = temp[n].fullName;
+      const profile  = temp[n].profile;
+
+      await playersListRef.child(n).update({ role, fullName, profile });
+
+      const infoRef = playersListRef.child(n).child("infoCards");
+
+      // 狂人は他プレイヤーのプロフィールベース
+      if (role === "madman") {
+        const others = names.filter(x => x !== n);
+        if (others.length) {
+          const pick = temp[others[Math.floor(Math.random() * others.length)]].profile;
+          await infoRef.push(`人狼は ${pick.outfit} を着ている`);
+          await infoRef.push(`人狼は ${pick.like} が好き`);
+        }
+      } else if (role !== "wolf") {
+        // 市民/探偵は自分のプロフィールベース
+        await infoRef.push(`人狼は ${profile.outfit} を着ている`);
+        await infoRef.push(`人狼は ${profile.like} が好き`);
+        await infoRef.push(`人狼は ${profile.dislike} が嫌い`);
+      }
+    }
+
+    // 母音ヒントをランダムな1人に付与（狼以外）
+    const wolfEntry = (await playersListRef.once("value")).val();
+    const entries = Object.entries(wolfEntry || {});
+    const wolfKV = entries.find(([_, v]) => v.role === "wolf");
+    if (wolfKV) {
+      const wolfFull = wolfKV[1].fullName || "";
+      const vowels = (wolfFull.match(/[aiueoアイウエオ]/gi) || []).length;
+      const candidates = entries.filter(([_, v]) => v.role !== "wolf");
+      if (candidates.length) {
+        const [targetName] = candidates[Math.floor(Math.random() * candidates.length)];
+        await playersListRef.child(targetName).child("infoCards")
+          .push(`人狼のフルネームには母音が ${vowels} 個含まれている`);
+      }
+    }
+
+    await messagesRef.push({
+      text: "役職とプロフィールが配布されました。",
+      name: "システム",
+      time: Date.now()
+    });
+  }
+
+  // ===== フェーズ進行 =====
+  async function startPhaseInDB(phase, day, durationSec) {
+    const endAt = Date.now() + durationSec * 1000;
+    await stateRef.set({
+      phase,
+      day,
+      phaseEndAt: endAt,
+      phasePaused: false
+    });
+    await actionsRef.set({});
+    await messagesRef.push({
+      text: `フェーズ開始: Day ${day} ${phase}`,
+      name: "システム",
+      time: Date.now()
+    });
+  }
+
+  async function nextPhaseInDB(phase, day) {
+    let idx = PHASE_ORDER.indexOf(phase);
+    let nextPhase = "morning";
+    let nextDay = day;
+
+    if (idx >= 0 && idx < PHASE_ORDER.length - 1) {
+      nextPhase = PHASE_ORDER[idx + 1];
+    } else {
+      nextPhase = "morning";
+      nextDay++;
+    }
+
+    const duration = PHASE_LENGTHS[nextPhase] || 60;
+    await startPhaseInDB(nextPhase, nextDay, duration);
+  }
 });
