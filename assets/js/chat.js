@@ -110,6 +110,11 @@ messagesRef.on("child_added", (snap) => {
   icon.className = "icon";
   icon.textContent = msg.name ? msg.name.charAt(0) : "?";
 
+  // アイコンタップでアクションメニュー
+  icon.addEventListener("click", () => {
+    openActionMenu(icon, msg);
+  });
+  
   // 名前＋吹き出しをまとめるコンテナ
   const msgContent = document.createElement("div");
   msgContent.className = "msg-content";
@@ -466,5 +471,112 @@ requestAnimationFrame(() => {
 
     const duration = PHASE_LENGTHS[nextPhase] || 60;
     await startPhaseInDB(nextPhase, nextDay, duration);
+  }
+
+  // ===== アクションメニュー（DM/キル/探偵/投票/死神の目）=====
+  function openActionMenu(anchorEl, msg) {
+    const prev = document.querySelector(".action-menu");
+    if (prev) prev.remove();
+
+    const menu = document.createElement("div");
+    menu.className = "action-menu";
+
+    // 個別チャット
+    const btnDM = document.createElement("button");
+    btnDM.textContent = "個別チャット";
+    btnDM.onclick = () => {
+      const ids = [playerName, msg.name].sort();
+      const privateRoomId = `${roomId}-dm-${ids[0]}-${ids[1]}`;
+      window.open(`chat.html?room=${privateRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+      menu.remove();
+    };
+    menu.appendChild(btnDM);
+
+    // キル（人狼・夜のみ）
+    if (myRole === "wolf" && currentPhase === "night") {
+      const btnKill = document.createElement("button");
+      btnKill.textContent = "キル";
+      btnKill.onclick = async () => {
+        const targetPlayer = msg.name;
+        if (targetPlayer === playerName) {
+          alert("自分はキルできません");
+          return;
+        }
+        const targetSnap = await playersListRef.child(targetPlayer).once("value");
+        const targetData = targetSnap.val();
+        if (!targetData || targetData.alive === false) {
+          alert("対象が存在しないか、すでに死亡しています");
+          return;
+        }
+        const full = targetData.fullName || targetPlayer;
+        const input = prompt(`${targetPlayer} のフルネームを入力してください`);
+        if (input && input.trim() === full) {
+          await playersListRef.child(targetPlayer).update({ alive: false });
+          await messagesRef.push({
+            text: `${targetPlayer} が襲撃されました！`,
+            name: "システム",
+            time: Date.now()
+          });
+          alert("キル成功！");
+        } else {
+          alert("キル失敗（名前が一致しません）");
+        }
+        menu.remove();
+      };
+      menu.appendChild(btnKill);
+    }
+
+    // 死神の目（死神・昼のみ、未使用なら）
+    if (myRole === "shinigami" && currentPhase === "day" && !usedShinigamiEye) {
+      const btnEye = document.createElement("button");
+      btnEye.textContent = "死神の目";
+      btnEye.onclick = async () => {
+        const targetPlayer = msg.name;
+        if (targetPlayer === playerName) {
+          alert("自分には使えません");
+          return;
+        }
+        await playersListRef.child(targetPlayer).update({ alive: false });
+        await messagesRef.push({
+          text: `${targetPlayer} は死神の目で死亡しました！`,
+          name: "システム",
+          time: Date.now()
+        });
+        usedShinigamiEye = true;
+        menu.remove();
+      };
+      menu.appendChild(btnEye);
+    }
+
+    // 探偵（探偵・夜のみ）
+    if (myRole === "detective" && currentPhase === "night") {
+      const btnDetective = document.createElement("button");
+      btnDetective.textContent = "探偵";
+      btnDetective.onclick = () => {
+        const gmRoomId = `${roomId}-gm-${playerName}`;
+        window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
+        menu.remove();
+      };
+      menu.appendChild(btnDetective);
+    }
+
+    // 投票（夕方）
+    if (currentPhase === "evening") {
+      const btnVote = document.createElement("button");
+      btnVote.textContent = "投票する";
+      btnVote.onclick = () => {
+        db.ref(`rooms/${roomId}/votes/${playerName}`).set(msg.name);
+        alert(`あなたは ${msg.name} に投票しました`);
+        menu.remove();
+      };
+      menu.appendChild(btnVote);
+    }
+
+    document.body.appendChild(menu);
+    // 位置調整
+    const rect = anchorEl.getBoundingClientRect();
+    menu.style.position = "fixed";
+    menu.style.left = `${rect.left}px`;
+    menu.style.top  = `${rect.bottom + 4}px`;
   }
 });
