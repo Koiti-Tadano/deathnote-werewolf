@@ -273,69 +273,54 @@ small{color:var(--muted)}
   justify-content: flex-end; /* 右寄せ */
 }
 
-.msg-row {
-  display: flex;
-  align-items: flex-end;
-  margin: 4px 0;
-  font-size: 0.9rem;
-}
+messagesRef.on("child_added", (snap) => {
+  const msg = snap.val();
+  const li = document.createElement("li");
 
-.msg-row.other {
-  justify-content: flex-start;
-  text-align: left;
-}
+  if (msg.name === "システム") {
+    li.className = "system-message";
+    li.textContent = msg.text;
+  } else {
+    const isSelf = (msg.name === playerName);
+    li.className = "msg-row " + (isSelf ? "self" : "other");
 
-.msg-row.self {
-  justify-content: flex-end;
-  text-align: right;
-}
+    if (isSelf) {
+      // 自分のメッセージ（右詰め: 吹き出し → 名前 → アイコン）
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = msg.text;
 
-/* アイコン */
-.icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  margin: 0 6px;
-  flex-shrink: 0;
-}
+      const nameSpan = document.createElement("div");
+      nameSpan.className = "msg-name";
+      nameSpan.textContent = msg.name;
 
-/* 名前を吹き出しの上に表示（LINE風） */
-.msg-name {
-  font-size: 0.7rem;
-  color: #666;
-  margin: 0 4px;
-}
+      const icon = document.createElement("div");
+      icon.className = "icon";
+      icon.textContent = msg.name[0];
 
-/* 吹き出し */
-.bubble {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: 16px;
-  max-width: 65%;
-  word-break: break-word;
-  white-space: pre-wrap;
-}
+      li.appendChild(bubble);
+      li.appendChild(nameSpan);
+      li.appendChild(icon);
+    } else {
+      // 他人のメッセージ（左詰め: アイコン → 名前 → 吹き出し）
+      const icon = document.createElement("div");
+      icon.className = "icon";
+      icon.textContent = msg.name[0];
 
-/* 他人の吹き出し（白） */
-.other .bubble {
-  background: #fff;
-  border: 1px solid #ddd;
-}
+      const nameSpan = document.createElement("div");
+      nameSpan.className = "msg-name";
+      nameSpan.textContent = msg.name;
 
-/* 自分の吹き出し（緑） */
-.self .bubble {
-  background: #9de47f;
-  color: #000;
-}
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = msg.text;
 
-/* 吹き出し＋名前を縦並びにする */
-.msg-content {
-  display: flex;
-  flex-direction: column;
-  max-width: 65%;
-}
+      li.appendChild(icon);
+      li.appendChild(nameSpan);
+      li.appendChild(bubble);
+    }
+  }
+
+  messagesList.appendChild(li);
+  messagesList.scrollTop = messagesList.scrollHeight;
+});
