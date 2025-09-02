@@ -527,7 +527,7 @@ requestAnimationFrame(() => {
     }
 
     // 死神の目（死神・昼のみ、未使用なら）
-    if (myRole === "shinigami" && currentPhase === "day" && !usedShinigamiEye) {
+    if (myRole === "wolf" && currentPhase === "night" && !usedShinigamiEye) {
       const btnEye = document.createElement("button");
       btnEye.textContent = "死神の目";
       btnEye.onclick = async () => {
