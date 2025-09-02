@@ -282,12 +282,15 @@ small{color:var(--muted)}
 
 .msg-row.other {
   justify-content: flex-start;
+  text-align: left;
 }
 
 .msg-row.self {
   justify-content: flex-end;
+  text-align: right;
 }
 
+/* アイコン */
 .icon {
   width: 28px;
   height: 28px;
@@ -301,12 +304,14 @@ small{color:var(--muted)}
   flex-shrink: 0;
 }
 
+/* 名前を吹き出しの上に表示（LINE風） */
 .msg-name {
-  font-size: 0.7px;
+  font-size: 0.7rem;
   color: #666;
   margin: 0 4px;
 }
 
+/* 吹き出し */
 .bubble {
   display: inline-block;
   padding: 8px 12px;
@@ -316,12 +321,21 @@ small{color:var(--muted)}
   white-space: pre-wrap;
 }
 
+/* 他人の吹き出し（白） */
 .other .bubble {
   background: #fff;
   border: 1px solid #ddd;
 }
 
+/* 自分の吹き出し（緑） */
 .self .bubble {
   background: #9de47f;
   color: #000;
+}
+
+/* 吹き出し＋名前を縦並びにする */
+.msg-content {
+  display: flex;
+  flex-direction: column;
+  max-width: 65%;
 }
