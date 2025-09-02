@@ -323,13 +323,16 @@ small{color:var(--muted)}
   display: inline-block;
   padding: 8px 12px;
   border-radius: 16px;
-  /* 最小文字幅（おおよそ15文字分）を確保、狭い画面では幅に合わせる */
-  min-width: min(15ch, 60%);
-  max-width: 65%;
-  word-break: normal;           /* 不自然な場所で切れないように */
-  overflow-wrap: break-word;    /* 長い単語は折り返す */
-  white-space: pre-wrap;        /* 改行を尊重しつつ折り返す */
+  /* 1行に収まる最大文字数を 15ch に設定 */
+  max-width: 15ch;
+  min-width: 2ch;       /* 1〜2文字のときも変に潰れないように */
+  
+  /* 自然な改行制御 */
+  white-space: pre-wrap;      /* 手動改行は尊重 */
+  overflow-wrap: break-word;  /* 単語が長い場合だけ折返し */
+  word-break: keep-all;       /* 日本語はできるだけ単語単位で改行 */
   box-sizing: border-box;
+}
 }
 
 /* 色 */
