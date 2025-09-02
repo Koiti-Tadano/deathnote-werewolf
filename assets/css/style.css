@@ -276,7 +276,8 @@ small{color:var(--muted)}
 .msg-row {
   display: flex;
   align-items: flex-end;
-  margin: 6px 0;
+  margin: 4px 0;
+  font-size: 0.9rem;
 }
 
 .msg-row.other {
@@ -288,8 +289,8 @@ small{color:var(--muted)}
 }
 
 .icon {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: #ccc;
   display: flex;
@@ -301,9 +302,9 @@ small{color:var(--muted)}
 }
 
 .msg-name {
-  font-size: 12px;
+  font-size: 0.7px;
   color: #666;
-  margin: 0 6px;
+  margin: 0 4px;
 }
 
 .bubble {
