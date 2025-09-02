@@ -94,25 +94,29 @@ messagesRef.on("child_added", (snap) => {
     li.className = "system-message";
     li.textContent = msg.text;
   } else {
-    const isMe = msg.name === playerName;
-    li.className = isMe ? "my-message" : "other-message";
+    const isSelf = (msg.name === playerName);
+    li.className = "msg-row " + (isSelf ? "self" : "other");
 
-    if (isMe) {
+    if (isSelf) {
+      // 自分のメッセージ（右詰め）
       li.innerHTML = `
-        <div class="msg-row self">
-          <div class="icon">${msg.name[0]}</div>
-          <div class="name">${msg.name}</div>
-          <div class="bubble green">${msg.text}</div>
-        </div>
+        <div class="msg-name">${msg.name}</div>
+        <div class="icon">${msg.name[0]}</div>
       `;
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = msg.text;
+      li.appendChild(bubble);
     } else {
+      // 他人のメッセージ（左詰め）
       li.innerHTML = `
-        <div class="msg-row other">
-          <div class="icon">${msg.name[0]}</div>
-          <div class="name">${msg.name}</div>
-          <div class="bubble white">${msg.text}</div>
-        </div>
+        <div class="icon">${msg.name[0]}</div>
+        <div class="msg-name">${msg.name}</div>
       `;
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = msg.text;
+      li.appendChild(bubble);
     }
   }
 
