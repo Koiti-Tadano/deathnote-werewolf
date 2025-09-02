@@ -1,4 +1,3 @@
-DOM
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
@@ -33,7 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const playerInfoEl = document.getElementById("playerInfo");
   const profileBtn   = document.getElementById("profileBtn");
   const itemsBtn     = document.getElementById("itemsBtn");
-
+  const chatBox = document.getElementById("chatBox");
+  
   if (roomInfoEl)   roomInfoEl.textContent = `ルームID: ${roomId}`;
   if (playerInfoEl) playerInfoEl.textContent = `あなた: ${playerName}`;
 
@@ -132,13 +132,21 @@ messagesRef.on("child_added", (snap) => {
     li.appendChild(icon);
     li.appendChild(msgContent);
   }
+messagesList.appendChild(li);
 
-  messagesList.appendChild(li);
-  messagesList.scrollTop = messagesList.scrollHeight;
+// ====== 確実に最下部へオートスクロール ======
+requestAnimationFrame(() => {
+  const container = chatBox || messagesList; // 通常は chatBox がスクロール対象
+  // 一発で決める
+  container.scrollTop = container.scrollHeight;
 
-  setTimeout(() => {
-    messagesList.scrollTop = messagesList.scrollHeight;
-  }, 50);
+  // 念のための保険（ネストしたスクローラでも効く）
+  const last = messagesList.lastElementChild;
+  if (last && last.scrollIntoView) {
+    last.scrollIntoView({ block: "end" }); // 近いスクロール祖先に対してスクロール
+  }
+});
+ 
 });
   // ===== 自分の状態監視（alive / 役職 / UI）=====
   playersRef.on("value", (snap) => {
