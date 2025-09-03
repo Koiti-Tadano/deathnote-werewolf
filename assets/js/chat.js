@@ -256,17 +256,19 @@ playersRef.on("value", (snap) => {
     const itemsEl = document.getElementById("itemsContent");
 
     if (profEl) {
-      profEl.innerHTML = `
-        <div class="card">
-          <b>役職: ${me.role || ""}</b><br>
-          服装: ${me.profile?.outfit || ""}<br>
-          好き: ${me.profile?.like || ""}<br>
-          嫌い: ${me.profile?.dislike || ""}<br>
-          得意: ${me.profile?.strong || ""}<br>
-          苦手: ${me.profile?.weak || ""}
-          <button class="shareBtn" data-type="profile">共有</button>
-        </div>
-      `;
+　　　　profEl.innerHTML = `
+  <div class="profile-card">
+    <table>
+      <tr><td><b>役職:</b></td><td>${me.role || ""}</td></tr>
+      <tr><td><b>服装:</b></td><td>${me.profile?.outfit || ""}</td></tr>
+      <tr><td><b>好き:</b></td><td>${me.profile?.like || ""}</td></tr>
+      <tr><td><b>嫌い:</b></td><td>${me.profile?.dislike || ""}</td></tr>
+      <tr><td><b>得意:</b></td><td>${me.profile?.strong || ""}</td></tr>
+      <tr><td><b>苦手:</b></td><td>${me.profile?.weak || ""}</td></tr>
+    </table>
+    <button class="shareBtn" data-type="profile">共有</button>
+  </div>
+`;
     }
 
     if (itemsEl) {
