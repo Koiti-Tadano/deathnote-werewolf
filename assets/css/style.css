@@ -346,3 +346,14 @@ small{color:var(--muted)}
   font-size: 0.85rem;
   margin: 8px 0;
 }
+
+.role-display {
+  font-weight: bold;
+  margin: 8px 0;
+  padding: 6px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  background: #222;
+  color: #fff;
+  text-align: center;
+}
