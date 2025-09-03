@@ -53,19 +53,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== GM コントロール =====
   const isGm = localStorage.getItem("isGm") === "true";
-  if (isGm) {
-    const gmControls = document.getElementById("gmControls");
-    if (gmControls) gmControls.style.display = "block";
+if (isGm) {
+  const gmControls = document.getElementById("gmControls");
+  if (gmControls) gmControls.style.display = "block";
 
-    const startBtn = document.getElementById("startGameBtn");
-    if (startBtn) {
-      startBtn.addEventListener("click", async () => {
-        await assignRolesAndProfiles(roomId);
-        await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
-        startBtn.style.display = "none"; // 一度押したら非表示
-      });
-    }
+  const startBtn = document.getElementById("startGameBtn");
+  if (startBtn) {
+    // すでに開始済みなら非表示
+    stateRef.child("started").on("value", snap => {
+      if (snap.val()) startBtn.style.display = "none";
+    });
+
+    startBtn.addEventListener("click", async () => {
+      const startedSnap = await stateRef.child("started").once("value");
+      if (startedSnap.val()) return; // 二重起動防止
+
+      await assignRolesAndProfiles(roomId);
+      await stateRef.update({ started: true });
+      await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
+      startBtn.style.display = "none";
+    });
   }
+}
   // ===== メッセージ送信 =====
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
@@ -379,6 +388,12 @@ playersRef.on("value", (snap) => {
     const snap = await playersListRef.once("value");
     const players = snap.val() || {};
     const names = Object.keys(players);
+  // すでに誰かが role を持っていたらスキップ
+  if (names.some(n => players[n].role)) {
+    console.log("役職は既に配布済みです");
+    return;
+  }
+
 
     // 役職リスト（人数に足りなければ villager）
     const baseRoles = ["wolf","madman","detective","villager","villager","villager","villager"];
