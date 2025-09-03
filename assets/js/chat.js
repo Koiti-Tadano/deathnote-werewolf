@@ -15,13 +15,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const db = firebase.database();
 
   // ===== Refs =====
-  const messagesRef    = db.ref(`rooms/${roomId}/messages`);
-  const stateRef       = db.ref(`rooms/${roomId}/state`);
-  const actionsRef     = db.ref(`rooms/${roomId}/actions`);
-  const playersRef     = db.ref(`rooms/${roomId}/players/${playerName}`);
-  const playersListRef = db.ref(`rooms/${roomId}/players`);
-  const tradesRef      = db.ref(`rooms/${roomId}/trades`); // ← 交渉リクエスト
+const rawRoomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
+const playerName = params.get("name") || localStorage.getItem("playerName") || "名無し";
 
+// DMかどうか判定
+const isDm = rawRoomId.includes("-dm-");
+const mainRoomId = isDm ? rawRoomId.split("-dm-")[0] : rawRoomId;
+
+// メッセージだけは DM 専用ルームを使う
+const chatRoomId = rawRoomId;
+
+// Firebase Refs
+const messagesRef    = db.ref(`rooms/${chatRoomId}/messages`); // DM or 全体
+const stateRef       = db.ref(`rooms/${mainRoomId}/state`);    // 全体のみ
+const playersListRef = db.ref(`rooms/${mainRoomId}/players`);  // 全体のみ
+const playersRef     = playersListRef.child(playerName);
+const tradesRef      = db.ref(`rooms/${chatRoomId}/trades`);   // DMごとに管理
   // ===== DOM =====
   const msgInput     = document.getElementById("msgInput");
   const sendBtn      = document.getElementById("sendBtn");
@@ -53,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== GM コントロール =====
   const isGm = localStorage.getItem("isGm") === "true";
-if (isGm) {
+if (!isDm && isGm) {
   const gmControls = document.getElementById("gmControls");
   if (gmControls) gmControls.style.display = "block";
 
@@ -68,7 +77,7 @@ if (isGm) {
       const startedSnap = await stateRef.child("started").once("value");
       if (startedSnap.val()) return; // 二重起動防止
 
-      await assignRolesAndProfiles(roomId);
+      await assignRolesAndProfiles(mainRoomId);
       await stateRef.update({ started: true });
       await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
       startBtn.style.display = "none";
