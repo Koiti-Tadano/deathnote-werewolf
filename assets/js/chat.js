@@ -1,4 +1,4 @@
-startGameBtn
+playersRef.on("value"
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
