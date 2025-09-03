@@ -1,4 +1,12 @@
 // assets/js/chat.js
+const db = firebase.database();
+const roomId = localStorage.getItem("roomId") || "defaultRoom";
+
+// メッセージ全部削除
+db.ref(`rooms/${roomId}/messages`).remove()
+  .then(() => console.log("メッセージをリセットしました"))
+  .catch(err => console.error("削除エラー:", err));
+
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
   const params = new URLSearchParams(window.location.search);
