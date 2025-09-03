@@ -153,18 +153,26 @@ requestAnimationFrame(() => {
 });
  
 });
-  // ===== 自分の状態監視（alive / 役職 / UI）=====
-  playersRef.on("value", (snap) => {
-    const me = snap.val() || {};
-    if (me.role) myRole = me.role;
+// ===== 自分の状態監視（alive / 役職 / UI）=====
+playersRef.on("value", (snap) => {
+  const me = snap.val() || {};
+  if (me.role) {
+    myRole = me.role;
 
-    if (me.alive === false) {
-      if (sendBtn) sendBtn.disabled = true;
-      if (actionBtn) actionBtn.disabled = true;
+    // 役職を画面に表示
+    const roleEl = document.getElementById("myRoleDisplay");
+    if (roleEl) {
+      roleEl.textContent = `あなたの役職: ${myRole}`;
     }
+  }
 
-    renderMyPanels(me);
-  });
+  if (me.alive === false) {
+    if (sendBtn) sendBtn.disabled = true;
+    if (actionBtn) actionBtn.disabled = true;
+  }
+
+  renderMyPanels(me);
+});
 
   // ===== フェーズ表示 / タイマー =====
   stateRef.on("value", (snap) => {
