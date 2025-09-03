@@ -1,4 +1,3 @@
-playersRef.on("value"
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
@@ -473,21 +472,6 @@ requestAnimationFrame(() => {
     await startPhaseInDB(nextPhase, nextDay, duration);
   }
 
-  playersRef.on("value", (snap) => {
-  const me = snap.val() || {};
-  if (me.role) {
-    myRole = me.role;
-    const roleEl = document.getElementById("myRoleDisplay");
-    if (roleEl) roleEl.textContent = `あなたの役職: ${myRole}`;
-  }
-
-  if (me.alive === false) {
-    if (sendBtn) sendBtn.disabled = true;
-    if (actionBtn) actionBtn.disabled = true;
-  }
-
-  renderMyPanels(me);
-});
   // ===== アクションメニュー（DM/キル/探偵/投票/死神の目）=====
   function openActionMenu(anchorEl, msg) {
     const prev = document.querySelector(".action-menu");
