@@ -325,37 +325,38 @@ playersRef.on("value", (snap) => {
     alert("交渉リクエストを送りました！");
   }
 
-  tradesRef.on("child_added", (snap) => {
-    const trade = snap.val();
-    const key = snap.key;
+tradesRef.on("child_added", (snap) => {
+  const trade = snap.val();
+  const key = snap.key;
 
-    if (trade.from === playerName) return;
-    if (trade.status !== "pending") return;
+  if (trade.from === playerName) return;
+  if (trade.status !== "pending") return;
 
-    const msg = (trade.type === "business") ? "名刺が届きました" : "情報カードが届きました";
-    if (confirm(`${trade.from} から ${msg}。承認しますか？`)) {
-      tradesRef.child(key).update({ status: "accepted", to: playerName });
+  const msg = (trade.type === "business") ? "名刺が届きました" : "情報カードが届きました";
+  if (confirm(`${trade.from} から ${msg}。承認しますか？`)) {
+    tradesRef.child(key).update({ status: "accepted", to: playerName });
 
-      // 自動交換処理
-      if (trade.type === "business") {
-        playersListRef.child(trade.from).once("value").then(snapFrom => {
-          const fromData = snapFrom.val() || {};
-          playersListRef.child(playerName).child("infoCards").push(fromData.profile ? JSON.stringify(fromData.profile) : "プロフィール情報");
-        });
-      } else if (trade.type === "info") {
-        playersListRef.child(trade.from).once("value").then(snapFrom => {
-          const fromData = snapFrom.val() || {};
-          const cards = Object.values(fromData.infoCards || {});
-          const idx = parseInt(trade.index);
-          if (cards[idx]) {
-            playersListRef.child(playerName).child("infoCards").push(cards[idx]);
-          }
-        });
-      }
-    } else {
-      tradesRef.child(key).update({ status: "rejected", to: playerName });
+    // 情報の交換は全体 playersListRef に反映
+    if (trade.type === "business") {
+      playersListRef.child(trade.from).once("value").then(snapFrom => {
+        const fromData = snapFrom.val() || {};
+        playersListRef.child(playerName).child("infoCards")
+          .push(fromData.profile ? JSON.stringify(fromData.profile) : "プロフィール情報");
+      });
+    } else if (trade.type === "info") {
+      playersListRef.child(trade.from).once("value").then(snapFrom => {
+        const fromData = snapFrom.val() || {};
+        const cards = Object.values(fromData.infoCards || {});
+        const idx = parseInt(trade.index);
+        if (cards[idx]) {
+          playersListRef.child(playerName).child("infoCards").push(cards[idx]);
+        }
+      });
     }
-  });
+  } else {
+    tradesRef.child(key).update({ status: "rejected", to: playerName });
+  }
+});
 
   // ===== 名前/プロフィール生成ユーティリティ =====
   const fakeSurnames = ["佐原木","神代川","高森田","藤宮堂","北条木","桐沢谷","篠原江","葛城井","綾峰","東雲木",
