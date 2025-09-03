@@ -274,7 +274,7 @@ playersRef.on("value", (snap) => {
     if (itemsEl) {
       const cards = Array.isArray(me.infoCards) ? me.infoCards : Object.values(me.infoCards || {});
       itemsEl.innerHTML = `
-        <div class="card">
+        <div class="business-card">
           <b>名刺</b><br>
           ${me.fullName || ""}<br>
           ${toKatakana(me.fullName || "")}
