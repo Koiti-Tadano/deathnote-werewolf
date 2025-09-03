@@ -545,18 +545,28 @@ playersRef.on("value", (snap) => {
           alert("自分には使えません");
           return;
         }
-        await playersListRef.child(targetPlayer).update({ alive: false });
-        await messagesRef.push({
-          text: `${targetPlayer} は死神の目で死亡しました！`,
-          name: "システム",
+　    if (!confirm("死神の目は一度しか使えません。使用しますか？")) {
+      menu.remove();
+      return;
+    }
+    usedShinigamiEye = true;
+    const targetSnap = await playersListRef.child(msg.name).once("value");
+    const targetData = targetSnap.val();
+    if (targetData?.fullName) {
+      // 人狼全員に秘密のDM的に公開
+      const wolvesSnap = await playersListRef.once("value");
+      const wolves = Object.entries(wolvesSnap.val() || {}).filter(([_, v]) => v.role === "wolf");
+      wolves.forEach(([wolfName]) => {
+        db.ref(`rooms/${roomId}/wolfNotes/${wolfName}`).push({
+          text: `${msg.name} の本名は ${targetData.fullName} です`,
           time: Date.now()
         });
-        usedShinigamiEye = true;
-        menu.remove();
-      };
-      menu.appendChild(btnEye);
+      });
     }
-
+    menu.remove();
+  };
+  menu.appendChild(btnEye);
+}
     // 探偵（探偵・夜のみ）
     if (myRole === "detective" && currentPhase === "night") {
       const btnDetective = document.createElement("button");
