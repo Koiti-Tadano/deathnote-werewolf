@@ -1,3 +1,21 @@
+async function processMorningDeaths() {
+  const players = (await playersListRef.once("value")).val() || {};
+  const deadPlayers = Object.entries(players).filter(([_, v]) => v.alive === false && !v.deathAnnounced);
+
+  for (const [name, data] of deadPlayers) {
+    await messagesRef.push({
+      text: `${name} が死亡しました`,
+      name: "システム",
+      time: Date.now()
+    });
+    await playersListRef.child(name).update({ deathAnnounced: true });
+  }
+}
+
+// 朝フェーズ開始時に呼ぶ
+if (phase === "morning") {
+  processMorningDeaths();
+}
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
