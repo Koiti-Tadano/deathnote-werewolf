@@ -58,7 +58,12 @@ const actionsRef = db.ref(`rooms/${mainRoomId}/actions`);  // 全体
 
   // ===== GM コントロール =====
   const isGm = localStorage.getItem("isGm") === "true";
-if (!isDm && isGm) {
+// GMは最初から観戦モード（送信不可）
+if (isGm) {
+  if (sendBtn) sendBtn.disabled = true;
+  if (actionBtn) actionBtn.disabled = true;
+}
+  if (!isDm && isGm) {
   const gmControls = document.getElementById("gmControls");
   if (gmControls) gmControls.style.display = "block";
 
