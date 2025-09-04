@@ -2,11 +2,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
   const params = new URLSearchParams(window.location.search);
-  const roomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
-  const playerName = params.get("name") || localStorage.getItem("playerName") || "名無し";
-  localStorage.setItem("roomId", roomId);
-  localStorage.setItem("playerName", playerName);
-
   // ===== Firebase =====
   if (typeof firebase === "undefined") {
     alert("Firebase が読み込まれていません！");
@@ -31,6 +26,7 @@ const stateRef       = db.ref(`rooms/${mainRoomId}/state`);    // 全体のみ
 const playersListRef = db.ref(`rooms/${mainRoomId}/players`);  // 全体のみ
 const playersRef     = playersListRef.child(playerName);
 const tradesRef      = db.ref(`rooms/${chatRoomId}/trades`);   // DMごとに管理
+const actionsRef = db.ref(`rooms/${mainRoomId}/actions`);  // 全体 
   // ===== DOM =====
   const msgInput     = document.getElementById("msgInput");
   const sendBtn      = document.getElementById("sendBtn");
