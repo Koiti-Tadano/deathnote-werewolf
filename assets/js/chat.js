@@ -516,7 +516,7 @@ tradesRef.on("child_added", (snap) => {
     btnDM.textContent = "個別チャット";
     btnDM.onclick = () => {
       const ids = [playerName, msg.name].sort();
-      const privateRoomId = `${roomId}-dm-${ids[0]}-${ids[1]}`;
+      const privateRoomId = `${mainRoomId}-dm-${ids[0]}-${ids[1]}`;
       window.open(`chat.html?room=${privateRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
       menu.remove();
     };
@@ -591,7 +591,7 @@ if (phase === "morning") {
       const wolvesSnap = await playersListRef.once("value");
       const wolves = Object.entries(wolvesSnap.val() || {}).filter(([_, v]) => v.role === "wolf");
       wolves.forEach(([wolfName]) => {
-        db.ref(`rooms/${roomId}/wolfNotes/${wolfName}`).push({
+        db.ref(`rooms/${mainRoomId}/wolfNotes/${wolfName}`).push({
           text: `${msg.name} の本名は ${targetData.fullName} です`,
           time: Date.now()
         });
@@ -606,7 +606,7 @@ if (phase === "morning") {
       const btnDetective = document.createElement("button");
       btnDetective.textContent = "探偵";
       btnDetective.onclick = () => {
-        const gmRoomId = `${roomId}-gm-${playerName}`;
+        const gmRoomId = `${mainRoomId}-gm-${playerName}`;
         window.open(`chat.html?room=${gmRoomId}&name=${encodeURIComponent(playerName)}`, "_blank");
         menu.remove();
       };
@@ -618,7 +618,7 @@ if (phase === "morning") {
       const btnVote = document.createElement("button");
       btnVote.textContent = "投票する";
       btnVote.onclick = () => {
-        db.ref(`rooms/${roomId}/votes/${playerName}`).set(msg.name);
+        db.ref(`rooms/${mainRoomId}/votes/${playerName}`).set(msg.name);
         alert(`あなたは ${msg.name} に投票しました`);
         menu.remove();
       };
