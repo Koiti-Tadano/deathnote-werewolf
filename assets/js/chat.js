@@ -188,6 +188,7 @@ playersRef.on("value", (snap) => {
   if (me.alive === false) {
     if (sendBtn) sendBtn.disabled = true;
     if (actionBtn) actionBtn.disabled = true;
+   showSpectatorUI();  // 👈 観戦用UIを表示する関数を呼ぶ
   }
 
   renderMyPanels(me);
