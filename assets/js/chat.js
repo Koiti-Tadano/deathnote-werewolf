@@ -39,7 +39,7 @@ const actionsRef = db.ref(`rooms/${mainRoomId}/actions`);  // 全体
   const itemsBtn     = document.getElementById("itemsBtn");
   const chatBox = document.getElementById("chatBox");
   
-  if (roomInfoEl)   roomInfoEl.textContent = `ルームID: ${roomId}`;
+  if (roomInfoEl)   roomInfoEl.textContent = `ルームID: ${mainRoomId}`;
   if (playerInfoEl) playerInfoEl.textContent = `あなた: ${playerName}`;
 
   // ===== 参加登録 =====
