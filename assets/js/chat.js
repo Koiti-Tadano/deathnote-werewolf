@@ -1,4 +1,3 @@
-assignRolesAndProfiles
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
@@ -392,6 +391,7 @@ tradesRef.on("child_added", (snap) => {
   }
   // ===== 役職/プロフィール/カード配布 =====
   async function assignRolesAndProfiles(roomId) {
+    const names = Object.keys(players).filter(n => players[n].role !== "gm");
     const snap = await playersListRef.once("value");
     const players = snap.val() || {};
     const names = Object.keys(players);
