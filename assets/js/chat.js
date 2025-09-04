@@ -1,3 +1,4 @@
+async function
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
