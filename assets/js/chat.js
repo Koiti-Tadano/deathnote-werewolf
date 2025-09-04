@@ -506,6 +506,7 @@ tradesRef.on("child_added", (snap) => {
 
   // ===== アクションメニュー（DM/キル/探偵/投票/死神の目）=====
   function openActionMenu(anchorEl, msg) {
+    if (msg.name === "GM" || myRole === "gm") return;
     const prev = document.querySelector(".action-menu");
     if (prev) prev.remove();
 
