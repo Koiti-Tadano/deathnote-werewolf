@@ -1,3 +1,4 @@
+playersRef.on("value", (snap) => {
 async function
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
@@ -44,8 +45,12 @@ const actionsRef = db.ref(`rooms/${mainRoomId}/actions`);  // 全体
   if (playerInfoEl) playerInfoEl.textContent = `あなた: ${playerName}`;
 
   // ===== 参加登録 =====
+if (isGm) {
+  playersRef.update({ joinedAt: Date.now(), alive: true, role: "gm" });
+} else {
   playersRef.update({ joinedAt: Date.now(), alive: true });
-  playersRef.onDisconnect().remove();
+}
+playersRef.onDisconnect().remove();
 
   // ===== 状態変数 =====
   let myRole = null;
