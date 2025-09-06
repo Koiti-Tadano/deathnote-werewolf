@@ -1,4 +1,4 @@
-if (me.alive === false) {
+“gm”
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
  const isGm = localStorage.getItem("isGm") === "true";
@@ -197,7 +197,6 @@ playersRef.on("value", (snap) => {
   renderMyPanels(me);
 });
 
-  if (me.alive === false) {
     if (sendBtn) sendBtn.disabled = true;
     if (actionBtn) actionBtn.disabled = true;
    showSpectatorUI();  // 👈 観戦用UIを表示する関数を呼ぶ
