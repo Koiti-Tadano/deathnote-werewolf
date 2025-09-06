@@ -1,4 +1,3 @@
-playersRef.on("value", (snap) => {
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
  const isGm = localStorage.getItem("isGm") === "true";
@@ -187,14 +186,15 @@ playersRef.on("value", (snap) => {
     if (actionBtn) actionBtn.disabled = true;
     showSpectatorUI();
   }
-});
 
-    // 役職を画面に表示
-    const roleEl = document.getElementById("myRoleDisplay");
-    if (roleEl) {
-      roleEl.textContent = `あなたの役職: ${myRole}`;
-    }
+  // 役職を画面に表示
+  const roleEl = document.getElementById("myRoleDisplay");
+  if (roleEl) {
+    roleEl.textContent = `あなたの役職: ${myRole || ""}`;
   }
+
+  renderMyPanels(me);
+});
 
   if (me.alive === false) {
     if (sendBtn) sendBtn.disabled = true;
