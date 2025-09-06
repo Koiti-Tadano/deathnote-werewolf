@@ -1,4 +1,4 @@
-“gm”
+“gm”“gm”
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
  const isGm = localStorage.getItem("isGm") === "true";
