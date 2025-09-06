@@ -1,5 +1,4 @@
-playersRef.on("value", (snap) => {
-async function
+if (!isDm && myRole === "gm") {
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
@@ -181,8 +180,14 @@ requestAnimationFrame(() => {
 // ===== 自分の状態監視（alive / 役職 / UI）=====
 playersRef.on("value", (snap) => {
   const me = snap.val() || {};
-  if (me.role) {
-    myRole = me.role;
+  myRole = me.role;
+
+  if (myRole === "gm" || me.alive === false) {
+    if (sendBtn) sendBtn.disabled = true;
+    if (actionBtn) actionBtn.disabled = true;
+    showSpectatorUI();
+  }
+});
 
     // 役職を画面に表示
     const roleEl = document.getElementById("myRoleDisplay");
