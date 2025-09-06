@@ -1,4 +1,3 @@
-if (!isDm && myRole === "gm") {
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
   // ===== URL / localStorage =====
@@ -68,7 +67,7 @@ if (isGm) {
   if (sendBtn) sendBtn.disabled = true;
   if (actionBtn) actionBtn.disabled = true;
 }
-  if (!isDm && isGm) {
+  if (!isDm && myRole === "gm") {
   const gmControls = document.getElementById("gmControls");
   if (gmControls) gmControls.style.display = "block";
 
