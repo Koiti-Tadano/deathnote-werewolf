@@ -44,7 +44,7 @@ const actionsRef = db.ref(`rooms/${mainRoomId}/actions`);  // 全体
   if (playerInfoEl) playerInfoEl.textContent = `あなた: ${playerName}`;
 
   // ===== 参加登録 =====
-if (isGm) {
+if (myRole === “gm”) {
   playersRef.update({ joinedAt: Date.now(), alive: true, role: "gm" });
 } else {
   playersRef.update({ joinedAt: Date.now(), alive: true });
@@ -61,10 +61,9 @@ playersRef.onDisconnect().remove();
   const PHASE_ORDER   = ["morning", "day", "evening", "night"];
   const PHASE_LENGTHS = { morning: 60, day: 6 * 60, evening: 2 * 60, night: 2 * 60 };
 
-  // ===== GM コントロール =====
-  const isGm = localStorage.getItem("isGm") === "true";
+
 // GMは最初から観戦モード（送信不可）
-if (isGm) {
+if (myRole === “gm”) {
   if (sendBtn) sendBtn.disabled = true;
   if (actionBtn) actionBtn.disabled = true;
 }
@@ -233,7 +232,7 @@ playersRef.on("value", (snap) => {
       document.querySelectorAll("#phaseTimer").forEach(el => el.textContent = `残り ${left}s`);
       if (left <= 0) {
         clearInterval(localTimerInterval);
-        if (isGm) {
+        if (myRole === “gm”) {
           stateRef.once("value").then(stSnap => {
             const st = stSnap.val() || {};
             if (!st.phasePaused && st.phaseEndAt && Date.now() >= st.phaseEndAt) {
@@ -261,7 +260,7 @@ playersRef.on("value", (snap) => {
     const players = playersSnap.val() || {};
     const total = Object.keys(players).length;
     const done  = Object.keys(actions).length;
-    if (total > 0 && done >= total && isGm) {
+    if (total > 0 && done >= total && myRole === “gm”) {
       const st = (await stateRef.once("value")).val() || {};
       nextPhaseInDB(st.phase, st.day);
     }
