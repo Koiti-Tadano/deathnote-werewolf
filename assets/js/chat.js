@@ -1,3 +1,4 @@
+playersRef.on("value", (snap) => {
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
  const isGm = localStorage.getItem("isGm") === "true";
