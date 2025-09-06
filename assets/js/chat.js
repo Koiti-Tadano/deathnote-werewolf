@@ -1,5 +1,6 @@
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
+ const isGm = localStorage.getItem("isGm") === "true";
   // ===== URL / localStorage =====
   const params = new URLSearchParams(window.location.search);
   // ===== Firebase =====
@@ -410,7 +411,6 @@ tradesRef.on("child_added", (snap) => {
     const names = Object.keys(players).filter(n => players[n].role !== "gm");
     const snap = await playersListRef.once("value");
     const players = snap.val() || {};
-    const names = Object.keys(players);
   // すでに誰かが role を持っていたらスキップ
   if (names.some(n => players[n].role)) {
     console.log("役職は既に配布済みです");
