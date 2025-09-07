@@ -1,4 +1,4 @@
-
+playersRef.on("value", (snap) => {
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
  const isGm = localStorage.getItem("isGm") === "true";
@@ -64,7 +64,7 @@ playersRef.onDisconnect().remove();
 
 
 // GMは最初から観戦モード（送信不可）
-if (myRole === "gm") {
+if (isGm) {
   if (sendBtn) sendBtn.disabled = true;
   if (actionBtn) actionBtn.disabled = true;
 }
@@ -408,9 +408,9 @@ tradesRef.on("child_added", (snap) => {
   }
   // ===== 役職/プロフィール/カード配布 =====
   async function assignRolesAndProfiles(roomId) {
-   const names = Object.keys(players).filter(n => players[n].role !== "gm");
-   const players = snap.val() || {};
    const snap = await playersListRef.once("value");
+   const players = snap.val() || {};
+   const names = Object.keys(players).filter(n => players[n].role !== "gm");
 
   // すでに誰かが role を持っていたらスキップ
   if (names.some(n => players[n].role)) {
