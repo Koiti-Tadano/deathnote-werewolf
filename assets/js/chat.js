@@ -573,7 +573,7 @@ tradesRef.on("child_added", (snap) => {
           alert("自分には使えません");
           return;
         }
-　    if (!confirm("死神の目は一度しか使えません。使用しますか？")) {
+       if (!confirm("死神の目は一度しか使えません。使用しますか？")) {
       menu.remove();
       return;
     }
