@@ -62,33 +62,8 @@ playersRef.onDisconnect().remove();
   const PHASE_LENGTHS = { morning: 60, day: 6 * 60, evening: 2 * 60, night: 2 * 60 };
 
 
-// GMは最初から観戦モード（送信不可）
-if (isGm) {
-  if (sendBtn) sendBtn.disabled = true;
-  if (actionBtn) actionBtn.disabled = true;
-}
-  if (!isDm && myRole === "gm") {
-  const gmControls = document.getElementById("gmControls");
-  if (gmControls) gmControls.style.display = "block";
 
-  const startBtn = document.getElementById("startGameBtn");
-  if (startBtn) {
-    // すでに開始済みなら非表示
-    stateRef.child("started").on("value", snap => {
-      if (snap.val()) startBtn.style.display = "none";
-    });
 
-    startBtn.addEventListener("click", async () => {
-      const startedSnap = await stateRef.child("started").once("value");
-      if (startedSnap.val()) return; // 二重起動防止
-
-      await assignRolesAndProfiles(mainRoomId);
-      await stateRef.update({ started: true });
-      await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
-      startBtn.style.display = "none";
-    });
-  }
-}
   // ===== メッセージ送信 =====
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
@@ -181,21 +156,49 @@ playersRef.on("value", (snap) => {
   const me = snap.val() || {};
   myRole = me.role;
 
+  // --- ボタンの有効/無効 ---
   if (myRole === "gm" || me.alive === false) {
     if (sendBtn) sendBtn.disabled = true;
     if (actionBtn) actionBtn.disabled = true;
     showSpectatorUI();
+  } else {
+    if (sendBtn) sendBtn.disabled = false;
+    if (actionBtn) actionBtn.disabled = false;
   }
 
-  // 役職を画面に表示
+  // --- 役職を画面に表示 ---
   const roleEl = document.getElementById("myRoleDisplay");
   if (roleEl) {
     roleEl.textContent = `あなたの役職: ${myRole || ""}`;
   }
 
+  // --- パネル更新 ---
   renderMyPanels(me);
-});
 
+  // --- GMコントロール表示 ---
+  if (!isDm && myRole === "gm") {
+    const gmControls = document.getElementById("gmControls");
+    if (gmControls) gmControls.style.display = "block";
+
+    const startBtn = document.getElementById("startGameBtn");
+    if (startBtn) {
+      // すでに開始済みなら非表示
+      stateRef.child("started").on("value", snap => {
+        if (snap.val()) startBtn.style.display = "none";
+      });
+
+      startBtn.addEventListener("click", async () => {
+        const startedSnap = await stateRef.child("started").once("value");
+        if (startedSnap.val()) return; // 二重起動防止
+
+        await assignRolesAndProfiles(mainRoomId);
+        await stateRef.update({ started: true });
+        await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
+        startBtn.style.display = "none";
+      });
+    }
+  }
+});
 
   // ===== フェーズ表示 / タイマー =====
   stateRef.on("value", (snap) => {
