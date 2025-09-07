@@ -1,8 +1,5 @@
-// --- 削除（同期で即無効化するブロック） ---
-if (isGm) {
-  if (sendBtn) sendBtn.disabled = true;
-  if (actionBtn) actionBtn.disabled = true;
-}
+playersRef.on("value", (snap) => {
+
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
  const isGm = localStorage.getItem("isGm") === "true";
