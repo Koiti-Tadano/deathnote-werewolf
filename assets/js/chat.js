@@ -1,4 +1,3 @@
-playersRef.on("value", (snap) => {
 // assets/js/chat.js
 document.addEventListener("DOMContentLoaded", () => {
  const isGm = localStorage.getItem("isGm") === "true";
@@ -197,13 +196,6 @@ playersRef.on("value", (snap) => {
   renderMyPanels(me);
 });
 
-    if (sendBtn) sendBtn.disabled = true;
-    if (actionBtn) actionBtn.disabled = true;
-   showSpectatorUI();  // 👈 観戦用UIを表示する関数を呼ぶ
-  }
-
-  renderMyPanels(me);
-});
 
   // ===== フェーズ表示 / タイマー =====
   stateRef.on("value", (snap) => {
