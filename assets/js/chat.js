@@ -167,15 +167,6 @@ playersRef.on("value", (snap) => {
   const me = snap.val() || {};
   myRole = me.role;
 
-  // --- ボタンの有効/無効 ---
-  if (myRole === "gm" || me.alive === false) {
-    if (sendBtn) sendBtn.disabled = true;
-    if (actionBtn) actionBtn.disabled = true;
-    showSpectatorUI();
-  } else {
-    if (sendBtn) sendBtn.disabled = false;
-    if (actionBtn) actionBtn.disabled = false;
-  }
 
   // --- 役職を画面に表示 ---
   const roleEl = document.getElementById("myRoleDisplay");
