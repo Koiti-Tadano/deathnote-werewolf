@@ -158,7 +158,8 @@ requestAnimationFrame(() => {
  
 });
 // ===== 自分の状態監視（alive / 役職 / UI）=====
-playersRef.on("value", (snap) => {
+let startBtnListenerAdded = false;
+ playersRef.on("value", (snap) => {
   const me = snap.val() || {};
   myRole = me.role;
 
@@ -222,33 +223,6 @@ playersRef.on("value", (snap) => {
     roleEl.textContent = `あなたの役職: ${myRole || ""}`;
   }
 
-  // --- パネル更新 ---
-  renderMyPanels(me);
-
-  // --- GMコントロール表示 ---
-  if (!isDm && myRole === "gm") {
-    const gmControls = document.getElementById("gmControls");
-    if (gmControls) gmControls.style.display = "block";
-
-    const startBtn = document.getElementById("startGameBtn");
-    if (startBtn) {
-      // すでに開始済みなら非表示
-      stateRef.child("started").on("value", snap => {
-        if (snap.val()) startBtn.style.display = "none";
-      });
-
-      startBtn.addEventListener("click", async () => {
-        const startedSnap = await stateRef.child("started").once("value");
-        if (startedSnap.val()) return; // 二重起動防止
-
-        await assignRolesAndProfiles(mainRoomId);
-        await stateRef.update({ started: true });
-        await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning);
-        startBtn.style.display = "none";
-      });
-    }
-  }
-});
 
   // ===== フェーズ表示 / タイマー =====
   stateRef.on("value", (snap) => {
