@@ -681,10 +681,3 @@ tradesRef.on("child_added", (snap) => {
   }
 });
 
-console.log("myRole:", myRole, "isDm:", isDm);
-
-if (!isDm && myRole === "gm") {
-  console.log("GM controls表示OK");
-  const gmControls = document.getElementById("gmControls");
-  if (gmControls) gmControls.style.display = "block";
-}
