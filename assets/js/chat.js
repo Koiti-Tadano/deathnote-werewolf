@@ -9,18 +9,14 @@ import {
 import {
   showSpectatorUI,
   renderMyPanels,
-　updateRoleDisplay,
+  updateRoleDisplay,
   updatePhaseUI
-
 } from "./ui.js";
 
 import {
-  openActionMenu
+  openActionMenu,
+  sendTradeRequest
 } from "./actions.js";
-
-import { renderMyPanels } from "./ui.js";
-import { sendTradeRequest } from "./actions.js";
-
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const rawRoomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
