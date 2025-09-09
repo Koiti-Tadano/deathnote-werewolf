@@ -44,11 +44,14 @@ function toKatakana(str) {
 }
 
 // ===== 役職/プロフィール/カード配布 =====
-export async function assignRolesAndProfiles(roomId) {
-  const playersListRef = db.ref(`rooms/${roomId}/players`);
-  const messagesRef = db.ref(`rooms/${roomId}/messages`);
+import { ref, get, child } from "./firebase.js";
 
-  const snap = await playersListRef.once("value");
+export async function assignRolesAndProfiles(roomId) {
+  const playersListRef = ref(db, `rooms/${roomId}/players`);
+  const messagesRef = ref(db, `rooms/${roomId}/messages`);
+
+  // once("value") の代わりに get() を使う
+  const snap = await get(playersListRef);
   const players = snap.val() || {};
   const names = Object.keys(players).filter(n => players[n].role !== "gm");
 
