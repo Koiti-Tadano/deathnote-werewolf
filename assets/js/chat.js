@@ -8,7 +8,10 @@ import {
 
 import {
   showSpectatorUI,
-  renderMyPanels
+  renderMyPanels,
+　updateRoleDisplay,
+  updatePhaseUI
+
 } from "./ui.js";
 
 import {
