@@ -118,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 自分の状態監視 =====
   onValue(playersRef, (snap) => {
     const me = snap.val() || {};
-renderMyPanels(me, sendTradeRequest, toKatakana);
     // GMや死亡時は発言禁止
     if (me.role === "gm" || me.alive === false) {
       if (sendBtn) sendBtn.disabled = true;
@@ -128,6 +127,7 @@ renderMyPanels(me, sendTradeRequest, toKatakana);
     }
 
     // UI更新（役職表示やプロフィールパネル）
-    renderMyPanels(me);
+    renderMyPanels(me, sendTradeRequest, toKatakana);
+    updateRoleDisplay(me.role);
   });
 });
