@@ -15,6 +15,9 @@ import {
   openActionMenu
 } from "./actions.js";
 
+import { renderMyPanels } from "./ui.js";
+import { sendTradeRequest } from "./actions.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const rawRoomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
@@ -116,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 自分の状態監視 =====
   onValue(playersRef, (snap) => {
     const me = snap.val() || {};
-
+renderMyPanels(me, sendTradeRequest, toKatakana);
     // GMや死亡時は発言禁止
     if (me.role === "gm" || me.alive === false) {
       if (sendBtn) sendBtn.disabled = true;
