@@ -1,3 +1,4 @@
+db.ref(...).once("value")
 // === actions.js ===
 import { db } from "./firebase.js";
 
