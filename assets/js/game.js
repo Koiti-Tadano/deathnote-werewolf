@@ -88,9 +88,10 @@ export async function assignRolesAndProfiles(roomId) {
     const fullName = temp[n].fullName;
     const profile  = temp[n].profile;
 
-    await playersListRef.child(n).update({ role, fullName, profile });
+    await playersListRef.child(ref,n).update({ role, fullName, profile });
 
-    const infoRef = playersListRef.child(n).child("infoCards");
+    const infoRef = child(playersListRef, n);
+const infoCardsRef = child(infoRef, "infoCards");
 
     // 狂人は他プレイヤーのプロフィールベース
     if (role === "madman") {
