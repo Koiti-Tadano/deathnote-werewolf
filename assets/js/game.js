@@ -44,24 +44,25 @@ function toKatakana(str) {
 }
 
 // ===== 役職/プロフィール/カード配布 =====
-import { ref, get, child } from "./firebase.js";
+
+import { ref, get, child, update, push, set } from "./firebase.js";
 
 export async function assignRolesAndProfiles(roomId) {
   const playersListRef = ref(db, `rooms/${roomId}/players`);
   const messagesRef = ref(db, `rooms/${roomId}/messages`);
 
-  // once("value") の代わりに get() を使う
+  // プレイヤー一覧を取得
   const snap = await get(playersListRef);
   const players = snap.val() || {};
   const names = Object.keys(players).filter(n => players[n].role !== "gm");
 
-  // すでに誰かが role を持っていたらスキップ
+  // すでに役職配布済みならスキップ
   if (names.some(n => players[n].role)) {
     console.log("役職は既に配布済みです");
     return;
   }
 
-  // 役職リスト（人数に足りなければ villager）
+  // 役職リスト
   const baseRoles = ["wolf","madman","detective","villager","villager","villager","villager"];
   const roles = [];
   for (let i = 0; i < names.length; i++) roles[i] = baseRoles[i] || "villager";
@@ -72,7 +73,7 @@ export async function assignRolesAndProfiles(roomId) {
     [roles[i], roles[j]] = [roles[j], roles[i]];
   }
 
-  // プロフィール生成（全員分まとめて先に作る）
+  // プロフィール生成
   const temp = {};
   names.forEach(n => {
     temp[n] = {
@@ -88,29 +89,38 @@ export async function assignRolesAndProfiles(roomId) {
     const fullName = temp[n].fullName;
     const profile  = temp[n].profile;
 
-    await playersListRef.child(ref,n).update({ role, fullName, profile });
+    // プレイヤー情報を更新
+    const playerRef = child(playersListRef, n);
+    await update(playerRef, { role, fullName, profile });
 
-    const infoRef = child(playersListRef, n);
-const infoCardsRef = child(infoRef, "infoCards");
+    // infoCards 参照
+    const infoCardsRef = child(playerRef, "infoCards");
 
-    // 狂人は他プレイヤーのプロフィールベース
+    // 狂人
     if (role === "madman") {
       const others = names.filter(x => x !== n);
       if (others.length) {
         const pick = temp[others[Math.floor(Math.random() * others.length)]].profile;
-        await infoRef.push(`人狼は ${pick.outfit} を着ている`);
-        await infoRef.push(`人狼は ${pick.like} が好き`);
+        const card1 = push(infoCardsRef);
+        await set(card1, `人狼は ${pick.outfit} を着ている`);
+        const card2 = push(infoCardsRef);
+        await set(card2, `人狼は ${pick.like} が好き`);
       }
-    } else if (role !== "wolf") {
-      // 市民/探偵は自分のプロフィールベース
-      await infoRef.push(`人狼は ${profile.outfit} を着ている`);
-      await infoRef.push(`人狼は ${profile.like} が好き`);
-      await infoRef.push(`人狼は ${profile.dislike} が嫌い`);
+    } 
+    // 市民/探偵
+    else if (role !== "wolf") {
+      const card1 = push(infoCardsRef);
+      await set(card1, `人狼は ${profile.outfit} を着ている`);
+      const card2 = push(infoCardsRef);
+      await set(card2, `人狼は ${profile.like} が好き`);
+      const card3 = push(infoCardsRef);
+      await set(card3, `人狼は ${profile.dislike} が嫌い`);
     }
   }
 
-  // 母音ヒントをランダムな1人に付与（狼以外）
-  const wolfEntry = (await playersListRef.once("value")).val();
+  // 母音ヒント
+  const wolfSnap = await get(playersListRef);
+  const wolfEntry = wolfSnap.val();
   const entries = Object.entries(wolfEntry || {});
   const wolfKV = entries.find(([_, v]) => v.role === "wolf");
   if (wolfKV) {
@@ -119,12 +129,15 @@ const infoCardsRef = child(infoRef, "infoCards");
     const candidates = entries.filter(([_, v]) => v.role !== "wolf");
     if (candidates.length) {
       const [targetName] = candidates[Math.floor(Math.random() * candidates.length)];
-      await playersListRef.child(targetName).child("infoCards")
-        .push(`人狼のフルネームには母音が ${vowels} 個含まれている`);
+      const targetInfoRef = child(child(playersListRef, targetName), "infoCards");
+      const card = push(targetInfoRef);
+      await set(card, `人狼のフルネームには母音が ${vowels} 個含まれている`);
     }
   }
 
-  await messagesRef.push({
+  // システムメッセージ
+  const msgRef = push(messagesRef);
+  await set(msgRef, {
     text: "役職とプロフィールが配布されました。",
     name: "システム",
     time: Date.now()
