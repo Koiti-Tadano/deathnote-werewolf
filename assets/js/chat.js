@@ -17,6 +17,9 @@ import {
   openActionMenu,
   sendTradeRequest
 } from "./actions.js";
+
+import { toKatakana } from "./game.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const rawRoomId = params.get("room") || localStorage.getItem("roomId") || "defaultRoom";
