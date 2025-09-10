@@ -1,5 +1,6 @@
 // === actions.js ===
 import { db } from "./firebase.js";
+import { ref, child, get, update, set, push } from "./firebase.js";
 
 // アクションメニューを表示
 export function openActionMenu(anchorEl, msg, context) {
@@ -33,7 +34,7 @@ export function openActionMenu(anchorEl, msg, context) {
         alert("自分はキルできません");
         return;
       }
-      const targetSnap = await playersListRef.child(targetPlayer)get(ref);
+      const targetSnap = await get(child(playersListRef, targetPlayer));
       const targetData = targetSnap.val();
       if (!targetData || targetData.alive === false) {
         alert("対象が存在しないか、すでに死亡しています");
@@ -42,7 +43,7 @@ export function openActionMenu(anchorEl, msg, context) {
       const full = targetData.fullName || targetPlayer;
       const input = prompt(`${targetPlayer} のフルネームを入力してください`);
       if (input && input.trim() === full) {
-        await playersListRef.child(targetPlayer).update(ref,{ alive: false });
+        await update(child(playersListRef, targetPlayer), { alive: false });
         alert("キル成功！");
       } else {
         alert("キル失敗（名前が一致しません）");
@@ -67,17 +68,20 @@ export function openActionMenu(anchorEl, msg, context) {
         return;
       }
       usedShinigamiEye.value = true;
-      const targetSnap = await playersListRef.child(msg.name)get(ref);
+
+      // 対象プレイヤー情報取得
+      const targetSnap = await get(child(playersListRef, msg.name));
       const targetData = targetSnap.val();
       if (targetData?.fullName) {
-        const wolvesSnap = await playersListRefget(ref);
+        const wolvesSnap = await get(playersListRef);
         const wolves = Object.entries(wolvesSnap.val() || {}).filter(([_, v]) => v.role === "wolf");
-        wolves.forEach(([wolfName]) => {
-          ref(db,`rooms/${mainRoomId}/wolfNotes/${wolfName}`).push({
+        for (const [wolfName] of wolves) {
+          const wolfNoteRef = push(ref(db, `rooms/${mainRoomId}/wolfNotes/${wolfName}`));
+          await set(wolfNoteRef, {
             text: `${msg.name} の本名は ${targetData.fullName} です`,
             time: Date.now()
           });
-        });
+        }
       }
       menu.remove();
     };
@@ -100,8 +104,8 @@ export function openActionMenu(anchorEl, msg, context) {
   if (currentPhase === "evening") {
     const btnVote = document.createElement("button");
     btnVote.textContent = "投票する";
-    btnVote.onclick = () => {
-      ref(db,`rooms/${mainRoomId}/votes/${playerName}`).set(msg.name);
+    btnVote.onclick = async () => {
+      await set(ref(db, `rooms/${mainRoomId}/votes/${playerName}`), msg.name);
       alert(`あなたは ${msg.name} に投票しました`);
       menu.remove();
     };
