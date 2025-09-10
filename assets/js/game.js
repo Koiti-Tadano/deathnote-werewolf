@@ -146,23 +146,29 @@ export async function assignRolesAndProfiles(roomId) {
 
 // ===== フェーズ進行 =====
 export async function startPhaseInDB(phase, day, durationSec, roomId) {
-  const stateRef = db.ref(`rooms/${roomId}/state`);
-  const actionsRef = db.ref(`rooms/${roomId}/actions`);
-  const messagesRef = db.ref(`rooms/${roomId}/messages`);
+  const stateRef = ref(db,`rooms/${roomId}/state`);
+  const actionsRef = ref(db,`rooms/${roomId}/actions`);
+  const messagesRef = ref(db,`rooms/${roomId}/messages`);
 
   const endAt = Date.now() + durationSec * 1000;
-  await stateRef.set({
-    phase,
-    day,
-    phaseEndAt: endAt,
-    phasePaused: false
-  });
-  await actionsRef.set({});
-  await messagesRef.push({
-    text: `フェーズ開始: Day ${day} ${phase}`,
-    name: "システム",
-    time: Date.now()
-  });
+// state を更新
+await set(stateRef, {
+  phase,
+  day,
+  phaseEndAt: endAt,
+  phasePaused: false
+});
+
+// actions を空にリセット
+await set(actionsRef, {});
+
+// messages にシステム文を追加
+const newMsgRef = push(messagesRef);
+await set(newMsgRef, {
+  text: `フェーズ開始: Day ${day} ${phase}`,
+  name: "システム",
+  time: Date.now()
+});
 }
 
 export async function nextPhaseInDB(phase, day, roomId) {
