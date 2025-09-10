@@ -39,7 +39,7 @@ function generateProfile() {
   };
 }
 
-function toKatakana(str) {
+export function toKatakana(str) {
   return str.replace(/[a-zA-Zぁ-ん]/g, "カタカナ");
 }
 
