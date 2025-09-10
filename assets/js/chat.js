@@ -39,6 +39,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const messagesList = document.getElementById("messages");
   const chatBox      = document.getElementById("chatBox");
 
+const stateRef = ref(db, `rooms/${mainRoomId}/state`);
+onValue(stateRef, (snap) => {
+  const state = snap.val() || {};
+  const { phase, day, phaseEndAt, phasePaused } = state;
+  let timeLeft = null;
+  if (phaseEndAt) {
+    timeLeft = Math.max(0, Math.floor((phaseEndAt - Date.now()) / 1000));
+  }
+  updatePhaseUI(phase, day, timeLeft, phasePaused);
+});
+  
   // ===== メッセージ送信 =====
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
