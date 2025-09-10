@@ -83,7 +83,14 @@ document.addEventListener("DOMContentLoaded", () => {
       icon.className = "icon";
       icon.textContent = msg.name ? msg.name.charAt(0) : "?";
       icon.addEventListener("click", () => {
-        openActionMenu(icon, msg);
+        openActionMenu(icon, msg, {
+          playerName,
+          myRole: me.role,
+          currentPhase,        // ← どこかで監視して変数に入れておく必要あり
+          mainRoomId,
+          playersListRef,
+          usedShinigamiEye: { value: false }
+        });
       });
 
       // 名前＋吹き出しをまとめるコンテナ
