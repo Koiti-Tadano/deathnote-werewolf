@@ -33,7 +33,7 @@ export function openActionMenu(anchorEl, msg, context) {
         alert("自分はキルできません");
         return;
       }
-      const targetSnap = await playersListRef.child(targetPlayer).once("value");
+      const targetSnap = await playersListRef.child(targetPlayer)get(ref);
       const targetData = targetSnap.val();
       if (!targetData || targetData.alive === false) {
         alert("対象が存在しないか、すでに死亡しています");
@@ -42,7 +42,7 @@ export function openActionMenu(anchorEl, msg, context) {
       const full = targetData.fullName || targetPlayer;
       const input = prompt(`${targetPlayer} のフルネームを入力してください`);
       if (input && input.trim() === full) {
-        await playersListRef.child(targetPlayer).update({ alive: false });
+        await playersListRef.child(targetPlayer).update(ref,{ alive: false });
         alert("キル成功！");
       } else {
         alert("キル失敗（名前が一致しません）");
@@ -67,13 +67,13 @@ export function openActionMenu(anchorEl, msg, context) {
         return;
       }
       usedShinigamiEye.value = true;
-      const targetSnap = await playersListRef.child(msg.name).once("value");
+      const targetSnap = await playersListRef.child(msg.name)get(ref);
       const targetData = targetSnap.val();
       if (targetData?.fullName) {
-        const wolvesSnap = await playersListRef.once("value");
+        const wolvesSnap = await playersListRefget(ref);
         const wolves = Object.entries(wolvesSnap.val() || {}).filter(([_, v]) => v.role === "wolf");
         wolves.forEach(([wolfName]) => {
-          db.ref(`rooms/${mainRoomId}/wolfNotes/${wolfName}`).push({
+          ref(db,`rooms/${mainRoomId}/wolfNotes/${wolfName}`).push({
             text: `${msg.name} の本名は ${targetData.fullName} です`,
             time: Date.now()
           });
@@ -101,7 +101,7 @@ export function openActionMenu(anchorEl, msg, context) {
     const btnVote = document.createElement("button");
     btnVote.textContent = "投票する";
     btnVote.onclick = () => {
-      db.ref(`rooms/${mainRoomId}/votes/${playerName}`).set(msg.name);
+      ref(db,`rooms/${mainRoomId}/votes/${playerName}`).set(msg.name);
       alert(`あなたは ${msg.name} に投票しました`);
       menu.remove();
     };
