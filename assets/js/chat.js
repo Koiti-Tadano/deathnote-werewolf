@@ -3,7 +3,10 @@ import {
   db,
   ref,
   push,
-  onValue
+  set,
+  onValue,
+  child,
+  get
 } from "./firebase.js";
 
 import {
@@ -32,24 +35,63 @@ document.addEventListener("DOMContentLoaded", () => {
   const messagesRef    = ref(db, `rooms/${chatRoomId}/messages`);
   const playersListRef = ref(db, `rooms/${mainRoomId}/players`);
   const playersRef     = ref(playersListRef, playerName);
+  const stateRef       = ref(db, `rooms/${mainRoomId}/state`);
+  const actionsRef     = ref(db, `rooms/${mainRoomId}/actions`);
 
   // ===== DOM =====
   const msgInput     = document.getElementById("msgInput");
   const sendBtn      = document.getElementById("sendBtn");
   const messagesList = document.getElementById("messages");
   const chatBox      = document.getElementById("chatBox");
+  const actionBtn    = document.getElementById("actionDoneBtn");
+  const actionStatus = document.getElementById("actionStatus");
 
-const stateRef = ref(db, `rooms/${mainRoomId}/state`);
-onValue(stateRef, (snap) => {
-  const state = snap.val() || {};
-  const { phase, day, phaseEndAt, phasePaused } = state;
-  let timeLeft = null;
-  if (phaseEndAt) {
-    timeLeft = Math.max(0, Math.floor((phaseEndAt - Date.now()) / 1000));
+  // ===== フェーズ表示 / タイマー =====
+  onValue(stateRef, (snap) => {
+    const state = snap.val() || {};
+    const { phase, day, phaseEndAt, phasePaused } = state;
+    let timeLeft = null;
+    if (phaseEndAt) {
+      timeLeft = Math.max(0, Math.floor((phaseEndAt - Date.now()) / 1000));
+    }
+    updatePhaseUI(phase, day, timeLeft, phasePaused);
+  });
+
+  // ===== 行動完了ボタン =====
+  if (actionBtn) {
+    actionBtn.addEventListener("click", () => {
+      set(child(actionsRef, playerName), true);
+      actionBtn.style.display = "none";
+      if (actionStatus) actionStatus.style.display = "block";
+    });
   }
-  updatePhaseUI(phase, day, timeLeft, phasePaused);
-});
-  
+
+  onValue(actionsRef, async (snap) => {
+    const actions = snap.val() || {};
+    const playersSnap = await get(playersListRef);
+    const players = playersSnap.val() || {};
+    const total = Object.keys(players).length;
+    const done  = Object.keys(actions).length;
+
+    // GMだけが全員完了チェックして進行
+    const meSnap = await get(playersRef);
+    const me = meSnap.val() || {};
+    if (total > 0 && done >= total && me.role === "gm") {
+      const stSnap = await get(stateRef);
+      const st = stSnap.val() || {};
+      // game.js の nextPhaseInDB を呼ぶ
+      import("./game.js").then(({ nextPhaseInDB }) => {
+        nextPhaseInDB(st.phase, st.day);
+      });
+    }
+
+    // 次フェーズでリセット
+    if (done === 0 && actionStatus) {
+      actionStatus.style.display = "none";
+      actionBtn.style.display = "inline-block";
+    }
+  });
+
   // ===== メッセージ送信 =====
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
@@ -77,7 +119,6 @@ onValue(stateRef, (snap) => {
     Object.values(msgs).forEach(msg => {
       const li = document.createElement("li");
 
-      // システムメッセージ
       if (msg.name === "システム") {
         li.className = "system-message";
         li.textContent = msg.text;
@@ -85,26 +126,24 @@ onValue(stateRef, (snap) => {
         return;
       }
 
-      // row 本体（self / other）
       const isSelf = msg.name === playerName;
       li.className = `msg-row ${isSelf ? "self" : "other"}`;
 
-      // アイコン
       const icon = document.createElement("div");
       icon.className = "icon";
       icon.textContent = msg.name ? msg.name.charAt(0) : "?";
+
       icon.addEventListener("click", () => {
         openActionMenu(icon, msg, {
           playerName,
-          myRole: me.role,
-          currentPhase,        // ← どこかで監視して変数に入れておく必要あり
+          myRole: me.role,   // ← 下の onValue(playersRef) で更新
+          currentPhase,      // ← stateRef 監視で更新して渡す
           mainRoomId,
           playersListRef,
           usedShinigamiEye: { value: false }
         });
       });
 
-      // 名前＋吹き出しをまとめるコンテナ
       const msgContent = document.createElement("div");
       msgContent.className = "msg-content";
 
@@ -129,7 +168,6 @@ onValue(stateRef, (snap) => {
       messagesList.appendChild(li);
     });
 
-    // スクロールを一番下に
     requestAnimationFrame(() => {
       const container = chatBox || messagesList;
       container.scrollTop = container.scrollHeight;
@@ -137,17 +175,16 @@ onValue(stateRef, (snap) => {
   });
 
   // ===== 自分の状態監視 =====
+  let me = {};
+  let currentPhase = "day";
   onValue(playersRef, (snap) => {
-    const me = snap.val() || {};
-    // GMや死亡時は発言禁止
+    me = snap.val() || {};
     if (me.role === "gm" || me.alive === false) {
       if (sendBtn) sendBtn.disabled = true;
       showSpectatorUI();
     } else {
       if (sendBtn) sendBtn.disabled = false;
     }
-
-    // UI更新（役職表示やプロフィールパネル）
     renderMyPanels(me, sendTradeRequest, toKatakana);
     updateRoleDisplay(me.role);
   });
