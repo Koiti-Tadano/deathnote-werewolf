@@ -21,7 +21,12 @@ import {
   sendTradeRequest
 } from "./actions.js";
 
-import { toKatakana } from "./game.js";
+import { 
+  toKatakana,
+  assignRolesAndProfiles,
+  startPhaseInDB,
+  PHASE_LENGTHS
+} from "./game.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
@@ -188,4 +193,43 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMyPanels(me, sendTradeRequest, toKatakana);
     updateRoleDisplay(me.role);
   });
+});
+// ===== 自分の状態監視 =====
+onValue(playersRef, (snap) => {
+  const me = snap.val() || {};
+
+  // GM のときだけ GM 操作用ボタンを表示
+  const gmControls = document.getElementById("gmControls");
+  if (me.role === "gm") {
+    gmControls.style.display = "block";
+  } else {
+    gmControls.style.display = "none";
+  }
+
+  // GM の開始ボタン処理
+  const startBtn = document.getElementById("startGameBtn");
+  if (startBtn) {
+    startBtn.onclick = async () => {
+      try {
+        await assignRolesAndProfiles(mainRoomId);
+        await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning, mainRoomId);
+        alert("ゲームを開始しました！");
+      } catch (e) {
+        console.error("ゲーム開始エラー:", e);
+        alert("ゲーム開始に失敗しました");
+      }
+    };
+  }
+
+  // GMや死亡時は発言禁止
+  if (me.role === "gm" || me.alive === false) {
+    if (sendBtn) sendBtn.disabled = true;
+    showSpectatorUI();
+  } else {
+    if (sendBtn) sendBtn.disabled = false;
+  }
+
+  // UI更新
+  renderMyPanels(me, sendTradeRequest, toKatakana);
+  updateRoleDisplay(me.role);
 });
