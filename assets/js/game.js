@@ -124,6 +124,20 @@ export async function assignRolesAndProfiles(roomId) {
   });
 }
 
+const startBtn = document.getElementById("startBtn");
+if (startBtn && !startBtnListenerAdded) {
+  startBtn.addEventListener("click", async () => {
+    const startedSnap = await stateRef.child("started").once("value");
+    if (startedSnap.val()) return; // 二重起動防止
+
+    await assignRolesAndProfiles(mainRoomId);
+    await stateRef.update({ started: true });
+    await startPhaseInDB("morning", 1, PHASE_LENGTHS.morning, mainRoomId);
+    startBtn.style.display = "none";
+  });
+  startBtnListenerAdded = true;
+}
+
 // ===== フェーズ進行 =====
 export async function startPhaseInDB(phase, day, durationSec, roomId) {
   const stateRef    = ref(db, `rooms/${roomId}/state`);
