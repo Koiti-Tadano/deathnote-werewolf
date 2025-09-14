@@ -122,13 +122,7 @@ export function openActionMenu(anchorEl, msg, context) {
 }
 
   // ===== 行動完了ボタン =====
-  if (actionBtn) {
-    actionBtn.addEventListener("click", () => {
-      set(child(actionsRef, playerName), true);
-      actionBtn.style.display = "none";
-      if (actionStatus) actionStatus.style.display = "block";
-    });
-  }
+
 
   onValue(actionsRef, async (snap) => {
     const actions = snap.val() || {};
@@ -155,10 +149,7 @@ document.getElementById("actionDoneBtn").addEventListener("click", async () => {
 // 全員完了チェック
 onValue(actionsRef, (snap) => {
   const actions = snap.val() || {};
-  const allDone = Object.values(actions).every(a => a.done);
-  if (allDone) {
-    nextPhaseInDB(state.phase, state.day, roomId);
-  }
+  
 });
     // 次フェーズでリセット
     if (done === 0 && actionStatus) {
