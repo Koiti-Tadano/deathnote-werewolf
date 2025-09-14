@@ -162,6 +162,18 @@ export async function startPhaseInDB(phase, day, durationSec, roomId) {
   });
 }
 
+setInterval(() => {
+  stateRef.once("value", (snap) => {
+    const state = snap.val();
+    if (!state || !state.phaseEndAt) return;
+    const timeLeft = Math.max(0, Math.floor((state.phaseEndAt - Date.now()) / 1000));
+
+    if (timeLeft <= 0 && !state.phasePaused) {
+      advancePhase(mainRoomId);
+    }
+  });
+}, 1000);
+
 export async function nextPhaseInDB(phase, day, roomId) {
   let idx = PHASE_ORDER.indexOf(phase);
   let nextPhase = "morning";
