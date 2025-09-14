@@ -62,40 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePhaseUI(phase, day, timeLeft, phasePaused);
   });
 
-  // ===== 行動完了ボタン =====
-  if (actionBtn) {
-    actionBtn.addEventListener("click", () => {
-      set(child(actionsRef, playerName), true);
-      actionBtn.style.display = "none";
-      if (actionStatus) actionStatus.style.display = "block";
-    });
-  }
-
-  onValue(actionsRef, async (snap) => {
-    const actions = snap.val() || {};
-    const playersSnap = await get(playersListRef);
-    const players = playersSnap.val() || {};
-    const total = Object.keys(players).length;
-    const done  = Object.keys(actions).length;
-
-    // GMだけが全員完了チェックして進行
-    const meSnap = await get(playersRef);
-    const me = meSnap.val() || {};
-    if (total > 0 && done >= total && me.role === "gm") {
-      const stSnap = await get(stateRef);
-      const st = stSnap.val() || {};
-      // game.js の nextPhaseInDB を呼ぶ
-      import("./game.js").then(({ nextPhaseInDB }) => {
-        nextPhaseInDB(st.phase, st.day);
-      });
-    }
-
-    // 次フェーズでリセット
-    if (done === 0 && actionStatus) {
-      actionStatus.style.display = "none";
-      actionBtn.style.display = "inline-block";
-    }
-  });
 
   // ===== メッセージ送信 =====
   if (sendBtn) {
