@@ -189,3 +189,8 @@ export async function nextPhaseInDB(phase, day, roomId) {
   const duration = PHASE_LENGTHS[nextPhase] || 60;
   await startPhaseInDB(nextPhase, nextDay, duration, roomId);
 }
+
+
+function getStateRef(roomId) {
+  return ref(db, `rooms/${roomId}/state`);
+}
