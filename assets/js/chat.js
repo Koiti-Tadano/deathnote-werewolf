@@ -35,6 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const isDm = rawRoomId.includes("-dm-");
   const mainRoomId = isDm ? rawRoomId.split("-dm-")[0] : rawRoomId;
   const chatRoomId = rawRoomId;
+
+  
+  // ===== Firebase Refs =====
+  const messagesRef    = ref(db, `rooms/${chatRoomId}/messages`);
+  const playersListRef = ref(db, `rooms/${mainRoomId}/players`);
+  const playersRef     = ref(db, `rooms/${mainRoomId}/players/${playerName}`);
+  const stateRef       = ref(db, `rooms/${mainRoomId}/state`);
+  const actionsRef     = ref(db, `rooms/${mainRoomId}/actions`);
   // ===== 自分の状態監視 =====
   let me = {};
   let currentPhase = "day";
@@ -51,13 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
   
-  // ===== Firebase Refs =====
-  const messagesRef    = ref(db, `rooms/${chatRoomId}/messages`);
-  const playersListRef = ref(db, `rooms/${mainRoomId}/players`);
-  const playersRef     = ref(db, `rooms/${mainRoomId}/players/${playerName}`);
-  const stateRef       = ref(db, `rooms/${mainRoomId}/state`);
-  const actionsRef     = ref(db, `rooms/${mainRoomId}/actions`);
-
   // ===== DOM =====
   const msgInput     = document.getElementById("msgInput");
   const sendBtn      = document.getElementById("sendBtn");
