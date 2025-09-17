@@ -160,9 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRoleDisplay(me.role);
   });
 });
-// ===== 自分の状態監視 =====
-onValue(playersRef, (snap) => {
-  const me = snap.val() || {};
 
   // GM のときだけ GM 操作用ボタンを表示
   const gmControls = document.getElementById("gmControls");
