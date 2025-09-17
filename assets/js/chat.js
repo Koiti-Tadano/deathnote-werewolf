@@ -35,7 +35,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const isDm = rawRoomId.includes("-dm-");
   const mainRoomId = isDm ? rawRoomId.split("-dm-")[0] : rawRoomId;
   const chatRoomId = rawRoomId;
-
+  // ===== 自分の状態監視 =====
+  let me = {};
+  let currentPhase = "day";
+  onValue(playersRef, (snap) => {
+    me = snap.val() || {};
+    if (me.role === "gm" || me.alive === false) {
+      if (sendBtn) sendBtn.disabled = true;
+      showSpectatorUI();
+    } else {
+      if (sendBtn) sendBtn.disabled = false;
+    }
+    renderMyPanels(me, sendTradeRequest, toKatakana);
+    updateRoleDisplay(me.role);
+  });
+});
+  
   // ===== Firebase Refs =====
   const messagesRef    = ref(db, `rooms/${chatRoomId}/messages`);
   const playersListRef = ref(db, `rooms/${mainRoomId}/players`);
