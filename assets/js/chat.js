@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== Firebase Refs =====
   const messagesRef    = ref(db, `rooms/${chatRoomId}/messages`);
   const playersListRef = ref(db, `rooms/${mainRoomId}/players`);
-  const playersRef     = ref(playersListRef, playerName);
+  const playersRef     = ref(db, `rooms/${mainRoomId}/players/${playerName}`);
   const stateRef       = ref(db, `rooms/${mainRoomId}/state`);
   const actionsRef     = ref(db, `rooms/${mainRoomId}/actions`);
 
