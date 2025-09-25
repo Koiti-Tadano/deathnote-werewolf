@@ -1,8 +1,9 @@
 // === actions.js ===
-import { db } from "./firebase.js";
-import { ref, child, get, update, set, push } from "./firebase.js";
+import { db, ref, child, get, update, set, push } from "./firebase.js";
 
+// ================================
 // アクションメニューを表示
+// ================================
 export function openActionMenu(anchorEl, msg, context) {
   const { playerName, myRole, currentPhase, mainRoomId, playersListRef, usedShinigamiEye } = context;
 
@@ -69,7 +70,6 @@ export function openActionMenu(anchorEl, msg, context) {
       }
       usedShinigamiEye.value = true;
 
-      // 対象プレイヤー情報取得
       const targetSnap = await get(child(playersListRef, msg.name));
       const targetData = targetSnap.val();
       if (targetData?.fullName) {
@@ -121,9 +121,24 @@ export function openActionMenu(anchorEl, msg, context) {
   menu.style.top  = `${rect.bottom + 4}px`;
 }
 
-  // ===== 行動完了ボタン =====
+// ================================
+// 行動完了ボタン管理
+// ================================
+export function initActions(mainRoomId, playerName, playersRef, playersListRef, stateRef) {
+  const actionsRef = ref(db, `rooms/${mainRoomId}/actions`);
+  const actionBtn = document.getElementById("actionDoneBtn");
+  const actionStatus = document.getElementById("actionStatus");
 
+  // 行動完了ボタン押下
+  if (actionBtn) {
+    actionBtn.addEventListener("click", async () => {
+      await update(child(actionsRef, playerName), { done: true });
+      actionBtn.style.display = "none";
+      if (actionStatus) actionStatus.style.display = "block";
+    });
+  }
 
+  // 全員完了チェック
   onValue(actionsRef, async (snap) => {
     const actions = snap.val() || {};
     const playersSnap = await get(playersListRef);
@@ -131,30 +146,21 @@ export function openActionMenu(anchorEl, msg, context) {
     const total = Object.keys(players).length;
     const done  = Object.keys(actions).length;
 
-    // GMだけが全員完了チェックして進行
+    // GMだけが次フェーズ進行
     const meSnap = await get(playersRef);
     const me = meSnap.val() || {};
     if (total > 0 && done >= total && me.role === "gm") {
       const stSnap = await get(stateRef);
       const st = stSnap.val() || {};
-      // game.js の nextPhaseInDB を呼ぶ
       import("./game.js").then(({ nextPhaseInDB }) => {
-        nextPhaseInDB(st.phase, st.day);
+        nextPhaseInDB(st.phase, st.day, mainRoomId);
       });
     }
-document.getElementById("actionDoneBtn").addEventListener("click", async () => {
-  await update(child(actionsRef, playerName), { done: true });
-});
 
-// 全員完了チェック
-onValue(actionsRef, (snap) => {
-  const actions = snap.val() || {};
-  
-});
     // 次フェーズでリセット
-    if (done === 0 && actionStatus) {
+    if (done === 0 && actionStatus && actionBtn) {
       actionStatus.style.display = "none";
       actionBtn.style.display = "inline-block";
     }
   });
-
+}
