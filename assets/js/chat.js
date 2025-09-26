@@ -19,7 +19,8 @@ import {
 
 import {
   openActionMenu,
-  sendTradeRequest
+  sendTradeRequest,
+  initActions    // ← ここを追加（行動管理は actions.js にまとめる）
 } from "./actions.js";
 
 import {
@@ -44,8 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn      = document.getElementById("sendBtn");
   const messagesList = document.getElementById("messages");
   const chatBox      = document.getElementById("chatBox");
-  const actionBtn    = document.getElementById("actionDoneBtn");
-  const actionStatus = document.getElementById("actionStatus");
+  // actionBtn/actionStatus は DOM に残しておきます（initActions が使います）
   const roomInfoEl   = document.getElementById("roomInfo");
   const playerInfoEl = document.getElementById("playerInfo");
 
@@ -66,13 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const usedShinigamiEye = { value: false }; // passable object for actions.js
 
   // ----- 参加登録（簡易） -----
-  // GM フラグは localStorage の isGm を使っている想定
   const isGm = localStorage.getItem("isGm") === "true";
   const joinData = { joinedAt: Date.now(), alive: true };
   if (isGm) joinData.role = "gm";
-  // update (v9: update via update(ref, obj))
   update(playersRef, joinData).catch(e => console.warn("playersRef update failed:", e));
-  // (onDisconnect is omitted here; add if you export onDisconnect from firebase.js)
 
   // ===== フェーズ表示 / タイマー =====
   onValue(stateRef, (snap) => {
@@ -168,46 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ===== 行動完了ボタン =====
-  if (actionBtn) {
-    actionBtn.addEventListener("click", async () => {
-      try {
-        await set(child(actionsRef, playerName), true);
-        actionBtn.style.display = "none";
-        if (actionStatus) actionStatus.style.display = "block";
-      } catch (e) {
-        console.error("action set failed:", e);
-      }
-    });
-  }
-
-  // actions の変化を監視して「全員完了」を判定（GM が進行）
-  onValue(actionsRef, async (snap) => {
-    const actions = snap.val() || {};
-    const playersSnap = await get(playersListRef);
-    const players = playersSnap.val() || {};
-    const total = Object.keys(players).length;
-    const done  = Object.keys(actions).length;
-
-    // 次フェーズでリセット（actions が空になったとき）
-    if (done === 0) {
-      if (actionStatus) actionStatus.style.display = "none";
-      if (actionBtn) actionBtn.style.display = "inline-block";
-    }
-
-    // GM が全員完了を検知したら nextPhase を呼ぶ
-    try {
-      const meSnap = await get(playersRef);
-      const meNow = meSnap.val() || {};
-      if (total > 0 && done >= total && meNow.role === "gm") {
-        const stSnap = await get(stateRef);
-        const st = stSnap.val() || {};
-        await nextPhaseInDB(st.phase, st.day, mainRoomId);
-      }
-    } catch (e) {
-      console.error("action handling error:", e);
-    }
-  });
+  // ===== 行動完了ボタン処理は actions.js に移動しました =====
+  // （initActions を呼んで、行動ボタンのイベント登録・全員判定を一元化します）
+  initActions(mainRoomId, playerName, playersRef, playersListRef, stateRef);
 
   // ===== 自分の状態監視（単一 onValue） =====
   onValue(playersRef, (snap) => {
@@ -236,11 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 発言制御・観戦UI
     if (me.role === "gm" || me.alive === false) {
       if (sendBtn) sendBtn.disabled = true;
-      if (actionBtn) actionBtn.disabled = true;
       showSpectatorUI();
     } else {
       if (sendBtn) sendBtn.disabled = false;
-      if (actionBtn) actionBtn.disabled = false;
     }
 
     // UI更新
@@ -251,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== trades の受信（交渉） =====
   onValue(tradesRef, (snap) => {
     const trades = snap.val() || {};
-    // handle new trades via child_added is nicer but for simplicity we scan
     Object.entries(trades).forEach(([key, trade]) => {
       if (!trade) return;
       if (trade.from === playerName) return;
@@ -266,11 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (trade.type === "business") {
           get(child(playersListRef, trade.from)).then(snapFrom => {
             const fromData = snapFrom.val() || {};
-            push(child(playersListRef, `${playerName}/infoCards`)).then(_ => {
-              // cannot push value then set easily; but we'll do a simple update:
-              push(child(playersListRef, `${playerName}/infoCards`)).then(cardRef => {
-                set(cardRef, fromData.profile ? JSON.stringify(fromData.profile) : "プロフィール情報");
-              });
+            push(child(playersListRef, `${playerName}/infoCards`)).then(cardRef => {
+              set(cardRef, fromData.profile ? JSON.stringify(fromData.profile) : "プロフィール情報");
             });
           });
         } else if (trade.type === "info") {
